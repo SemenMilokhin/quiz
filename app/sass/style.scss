@@ -323,10 +323,15 @@ button, input {
 }
 @media (max-width: 767px) {
 	.quiz {
+		&__header {
+			padding: 15px;
+		}
 		&__body {
 			margin-bottom: 154px;
+			padding: 15px;
 		}
 		&__footer {
+			padding: 15px;
 			flex-direction: column;
 			justify-content: flex-start;
 			align-items: stretch;
