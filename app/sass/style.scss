@@ -51,23 +51,20 @@ button, input {
 	&__body {
 		padding: 30px;
 		flex-grow: 1;
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		flex-wrap: wrap;
+		overflow: auto;
 	}
 	&__select {
-		min-width: 49%;
-		height: 50px;
-		display: inline-block;
+		min-height: 50px;
+		margin: 0 0 18px;
+		display: block;
 		position: relative;
-		z-index: 1;
 		border-radius: 5px;
 	    transition: box-shadow .15s ease-out;
 		&_opened {
 			button {
 				border-radius: 5px 5px 0 0;
 				border-bottom: none;
+				padding-bottom: 15.5px;
 				&::after {
 					transform: rotate(180deg);
 				}
@@ -88,8 +85,8 @@ button, input {
 		outline: none;
 		cursor: pointer;
 		border-radius: 4px;
-		position: absolute;
-		padding: 10px 40px 10px 15px;
+		position: relative;
+		padding: 14.5px 40px 14.5px 15px;
 		font-size: 16px;
 		top: 0;
 		left: 0;
@@ -112,11 +109,11 @@ button, input {
 	&__select-options-list {
 		display: none;
 		position: absolute;
-		z-index: 1;
+		z-index: 2;
 		top: 100%;
 		left: 0;
 		list-style: none;
-		margin: 0;
+		margin: -1px 0 0;
 		padding: 0;
 		background-color: #f7f7f7;
 		width: 100%;
@@ -140,7 +137,7 @@ button, input {
 	}
 	&__footer {
 		padding: 30px;
-		border-top: 1px solid #f3f3f3;
+		border-top: 2px solid #f3f3f3;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -197,9 +194,13 @@ button, input {
 		}
 	}
 	&__buttons {
-		font-size: 0;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		flex-wrap: wrap;
 	}
 	&__btn {
+		display: block;
 		color: #000;
 		font-size: 16px;
 		font-weight: 500;
@@ -248,10 +249,10 @@ button, input {
 				background: linear-gradient(90deg,hsla(0,0%,100%,.1) 10%,hsla(0,0%,100%,.2) 20%,hsla(0,0%,100%,.6));
 				width: 20px;
 				transform: skewX(-45deg);
-				left: -30%;
+				left: -100%;
 				transition: all .6s ease;
 				animation-name: blick;
-				animation-duration: 6s;
+				animation-duration: 10s;
 				animation-iteration-count: infinite;
 			}
 		}
@@ -272,7 +273,7 @@ button, input {
 	}
 }
 @keyframes blick{
-	15%,to{left:110%} 
+	15%,to{left:140%} 
 }
 @keyframes move {
     0% {
@@ -281,4 +282,87 @@ button, input {
     to {
         background-position: 20px 20px
     }
+}
+@media (max-width: 1200px) {
+	.quiz-container {
+		align-items: flex-start;
+	}
+	.quiz {
+		width: 100vw;
+		height: 100vh;
+		border: none;
+		&__body {
+			margin-bottom: 104px;
+		}
+		&__footer {
+			position: fixed;
+			z-index: 10;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background-color: #aaa;
+			border: none;
+		}
+		&__process-label {
+			color: $light-text;
+			span {
+				color: inherit;
+			}
+		}
+		&__btn {
+			border-radius: 4px;
+			background-color: #636363;
+			color: $light-text;
+			border: none;
+			line-height: 43px;
+			&_fill {
+				background-color: $contrast-color;
+			}
+		}
+	}
+}
+@media (max-width: 767px) {
+	.quiz {
+		&__body {
+			margin-bottom: 154px;
+		}
+		&__footer {
+			flex-direction: column;
+			justify-content: flex-start;
+			align-items: stretch;
+		}
+		&__buttons {
+			justify-content: space-between;
+		}
+		&__process {
+			margin-top: 0;
+			margin-right: 0;
+			margin-bottom: 20px;
+		}
+		&__btn {
+			margin-right: 0;
+			&_prev {
+				font-size: 0;
+				padding-left: 12px;
+				padding-right: 12px;
+			}
+		}
+	}
+}
+@media (max-width: 374px) {
+	.quiz {
+		&__btn {
+			&_next {
+				font-size: 0;
+				padding-left: 12px;
+				padding-right: 12px;
+			}
+			&_blicked {
+				&::after {
+					animation-duration: 6s;
+				}
+			}
+		}
+	}
+
 }
