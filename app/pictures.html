@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Quiz</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/swiper.min.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="quiz-container">
+	<div class="quiz">
+		<div class="quiz__header">
+			<h1 class="quiz__title">Основной текст вопроса (title)</h1>
+			<p class="quiz__description">Описание текста вопроса, хочу посмотреть как будет выглядеть данный элемент, располагаясь в две строки и более (description)</p>
+		</div>
+		<div class="quiz__body">
+			<div class="swiper-container">
+				<div class="quiz__pictures swiper-wrapper">
+					<label class="quiz__pic quiz__pic_checked swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка</div>
+					</label>
+					<label class="quiz__pic swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка в две небольшие строки</div>
+					</label>
+					<label class="quiz__pic swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка</div>
+					</label>
+					<label class="quiz__pic swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка</div>
+					</label>
+					<label class="quiz__pic swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка</div>
+					</label>
+					<label class="quiz__pic swiper-slide">
+						<input class="quiz__hidden-input" type="radio" value="val-1" name="radio-btns-1">
+						<div class="quiz__pic-img-wrapper">
+							<img class="quiz__pic-img" src="img/pic.png" alt="example">
+						</div>
+						<div class="quiz__pic-label">Приписка</div>
+					</label>
+				</div>
+				<div class="swiper-button-prev">
+					<svg class="swiper-button-svg" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 451.846 451.847">
+						<path d="M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744L278.318,225.92L106.409,54.017c-12.354-12.359-12.354-32.394,0-44.748c12.354-12.359,32.391-12.359,44.75,0l194.287,194.284c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,248.292z"/>
+					</svg>
+				</div>
+    			<div class="swiper-button-next">
+    				<svg class="swiper-button-svg" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 451.846 451.847">
+						<path d="M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744L278.318,225.92L106.409,54.017c-12.354-12.359-12.354-32.394,0-44.748c12.354-12.359,32.391-12.359,44.75,0l194.287,194.284c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,248.292z"/>
+					</svg>
+    			</div>
+    			<div class="swiper-scrollbar"></div>
+			</div>
+		</div>
+		<div class="quiz__footer">
+			<div class="quiz__process">
+				<div class="quiz__process-label">
+					Готово:<span>20%</span>
+				</div>
+				<div class="quiz__process-field">
+					<span style="width: 20%;"></span>
+				</div>
+			</div>
+			<div class="quiz__buttons">
+				<button disabled class="quiz__btn quiz__btn_prev quiz__btn_fill">
+					<svg class="quiz__btn-svg quiz__btn-svg_inverted" x="0px" y="0px" viewBox="0 0 31.49 31.49" xml:space="preserve">
+						<path d="M21.205,5.007c-0.429-0.444-1.143-0.444-1.587,0c-0.429,0.429-0.429,1.143,0,1.571l8.047,8.047H1.111C0.492,14.626,0,15.118,0,15.737c0,0.619,0.492,1.127,1.111,1.127h26.554l-8.047,8.032c-0.429,0.444-0.429,1.159,0,1.587c0.444,0.444,1.159,0.444,1.587,0l9.952-9.952c0.444-0.429,0.444-1.143,0-1.571L21.205,5.007z"/>
+					</svg>
+					Назад
+				</button>
+				<button class="quiz__btn quiz__btn_skip">Пропустить</button>
+				<button class="quiz__btn quiz__btn_next quiz__btn_fill quiz__btn_blicked">
+					Далее
+					<svg class="quiz__btn-svg" x="0px" y="0px" viewBox="0 0 31.49 31.49" xml:space="preserve">
+						<path d="M21.205,5.007c-0.429-0.444-1.143-0.444-1.587,0c-0.429,0.429-0.429,1.143,0,1.571l8.047,8.047H1.111C0.492,14.626,0,15.118,0,15.737c0,0.619,0.492,1.127,1.111,1.127h26.554l-8.047,8.032c-0.429,0.444-0.429,1.159,0,1.587c0.444,0.444,1.159,0.444,1.587,0l9.952-9.952c0.444-0.429,0.444-1.143,0-1.571L21.205,5.007z"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</div>
+	<script src="js/jquery.min.js"></script>
+	<script src="js/swiper.min.js"></script>
+	<script src="js/common.js"></script>
+</body>
+</html>

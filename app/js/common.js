@@ -2,6 +2,19 @@ $(document).ready(function(){
 	initQuizSelects();
 	initQuizCheckboxes();
 	initCheckInput();
+	var mySwiper = new Swiper ('.swiper-container', {
+      // Optional parameters
+		slidesPerView: 'auto',
+		spaceBetween: 20,
+		direction: 'horizontal',
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+		scrollbar: {
+			el: '.swiper-scrollbar'
+		},
+    })
 
 	function initQuizSelects() {
 		var selects = $('.quiz__select');
@@ -31,7 +44,7 @@ $(document).ready(function(){
 						text  = $(el).text();
 					evt.preventDefault();
 					input.val(value);
-					btn.text(text);
+					btn.find('span').text(text);
 					closeSelect();
 				})
 			});
@@ -54,8 +67,9 @@ $(document).ready(function(){
 	}
 
 	function initQuizCheckboxes() {
-		var radioBtns = $('.quiz__radio-btns').find('.quiz__radio-input'),
-			checkboxes = $('.quiz__checkboxes').find('.quiz__checkbox-input'),
+		var radioBtns  = $('.quiz__radio-btns').find('.quiz__hidden-input'),
+			checkboxes = $('.quiz__checkboxes').find('.quiz__hidden-input'),
+			pictures   = $('.quiz__pictures').find('.quiz__hidden-input'),
 			uncheck = function(array,number) {
 				array.each(function(iter,elem){
 					if (iter !== number) {
@@ -78,7 +92,7 @@ $(document).ready(function(){
 								parentClass   = inputParent[0].classList[0],
 								checkedClass  = parentClass+'_checked';
 
-							if (parentClass==='quiz__radio') {
+							if (parentClass==='quiz__radio'||parentClass==='quiz__pic') {
 								uncheck(array,i);
 							}
 
@@ -102,6 +116,7 @@ $(document).ready(function(){
 			
 		iterate(radioBtns);
 		iterate(checkboxes);
+		iterate(pictures);
 	}
 
 	function initCheckInput() {
@@ -126,7 +141,7 @@ $(document).ready(function(){
 			} else if (field.val()!==''&&!checkInput.hasClass('quiz__check-input_checked')&&!checkInputParent.hasClass('quiz__radio-btns')) {
 				checkInput.addClass('quiz__check-input_checked');
 			} else if (field.val()!==''&&!checkInput.hasClass('quiz__check-input_checked')&&checkInputParent.hasClass('quiz__radio-btns')) {
-				checkInputParent.find('.quiz__radio-input').each(function(i,el){
+				checkInputParent.find('.quiz__hidden-input').each(function(i,el){
 					if ($(el).prop('checked')) {
 						$(el).prop('checked',false).change();
 					}
