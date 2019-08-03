@@ -2,19 +2,7 @@ $(document).ready(function(){
 	initQuizSelects();
 	initQuizCheckboxes();
 	initCheckInput();
-	var mySwiper = new Swiper ('.swiper-container', {
-      // Optional parameters
-		slidesPerView: 'auto',
-		spaceBetween: 20,
-		direction: 'horizontal',
-		navigation: {
-			nextEl: '.swiper-button-next',
-			prevEl: '.swiper-button-prev',
-		},
-		scrollbar: {
-			el: '.swiper-scrollbar'
-		},
-    })
+	initSwiper();	
 
 	function initQuizSelects() {
 		var selects = $('.quiz__select');
@@ -149,5 +137,22 @@ $(document).ready(function(){
 				checkInput.addClass('quiz__check-input_checked');
 			}
 		});
+	}
+
+	function initSwiper() {
+		if ($('.swiper-container').length>0) {
+			var mySwiper = new Swiper ('.swiper-container', {
+				slidesPerView: 'auto',
+				spaceBetween: 20,
+				direction: 'horizontal',
+				navigation: {
+					nextEl: '.swiper-button-next',
+					prevEl: '.swiper-button-prev',
+				},
+				scrollbar: {
+					el: '.swiper-scrollbar'
+				},
+			})
+		}
 	}
 });
