@@ -1,15 +1,190 @@
 $(document).ready(function(){
+	loadJSON();
 	initQuizSelects();
-	initQuizCheckboxes();
+	// initQuizCheckboxes();
 	initCheckInput();
-	initSwiper();	
+	initSwiper();
 
+	function loadJSON() {
+		$.getJSON('../json/config.json', function(data){
+			var objSize = function(object) {
+					var size = 0;
+					for (var key in object) {
+						if (object.hasOwnProperty(key)) size++;
+					}
+					return size;
+				},
+				renderQuestion = function(obj) {
+					$('.quiz__title').append(obj.title);
+					$('.quiz__description').append(obj.description);
+					switch(obj.type) {
+						case 'radio':
+							var block = $('<div>',{class: 'quiz__radio-btns'});
+							for (var key in obj.poll) {
+								block.append($('<label>',{
+									class: 'quiz__radio',
+									append: $('<input>',{
+										class: 'quiz__hidden-input',
+										type: 'radio',
+										val: key,
+										name: 'radio-group'
+									})
+									.add($('<span>',{class:'quiz__radio-point'}))
+									.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+								}));
+							}
+							block.appendTo('.quiz__body');
+							initQuizCheckboxes('radio-btns');
+							break;
+						case 'checkbox':
+							var block = $('<div>',{class: 'quiz__checkboxes'});
+							for (var key in obj.poll) {
+								block.append($('<label>',{
+									class: 'quiz__checkbox',
+									append: $('<input>',{
+										class: 'quiz__hidden-input',
+										type: 'checkbox',
+										val: key,
+										name: 'checkbox-group'
+									})
+									.add($('<span>',{class:'quiz__checkbox-point'}))
+									.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+								}));
+							}
+							block.appendTo('.quiz__body');
+							initQuizCheckboxes('checkboxes');
+							break;
+						case 'select':
+							var list = $('<ul>',{class: 'quiz__select-options-list'});
+							for (var key in obj.poll) {
+								list.append($('<li>',{
+									class: 'quiz__select-option',
+									'data-value': key,
+									text: obj.poll[key]
+								}));
+							}
+							var block = $('<div>',{
+								class: 'quiz__select',
+								append: $('<button>',{
+									class: 'quiz__select-btn',
+									append: $('<span>',{text:'Выберите значение из списка'})
+										.add($('<svg>',{class: 'quiz__select-btn-svg',})),
+								})
+								.add(list)
+								.add($('<input>',{
+									class: 'quiz__hidden-input',
+									type: 'text',
+								})),
+							});
+							block.appendTo('.quiz__body');
+							initQuizSelects();
+							break;
+						case 'pic':
+							var pictures = $('<div>',{class: 'quiz__pictures swiper-wrapper'});
+							for (var key in obj.poll) {
+								pictures.append($('<label>',{
+									class: 'quiz__pic swiper-slide',
+									append: $('<input>',{
+										class: 'quiz__hidden-input',
+										type: 'radio',
+										val: key,
+										name: 'pictures-group'
+									})
+									.add($('<div>',{
+										class: 'quiz__pic-img-wrapper',
+										append: $('<img>',{
+											class: 'quiz__pic-img',
+											src: obj.pic[key],
+											alt: obj.poll[key],
+										}),
+									}))
+									.add($('<div>',{
+										class:'quiz__pic-label',
+										text: obj.poll[key],
+									})),
+								}));
+							}
+							var block = $('<div>',{
+								class: 'swiper-container',
+								append: pictures.add($('<div>',{
+									class:'swiper-button-prev',
+									append: $('<svg>',{class: 'swiper-button-svg'}),
+								}))
+								.add($('<div>',{
+									class:'swiper-button-next',
+									append: $('<svg>',{class: 'swiper-button-svg'}),
+								}))
+								.add($('<div>',{class:'swiper-scrollbar'})),
+							});
+							block.appendTo('.quiz__body');
+							initQuizCheckboxes('pictures');
+							initSwiper();
+							break;
+						case 'text':
+							var block = $('<textarea>',{
+								class: 'quiz__textarea',
+								placeholder: 'Введите текст'
+							});
+							block.appendTo($('.quiz__body'));
+							break;
+						case 'num':
+							var block = $('<input>',{
+								class: 'quiz__number',
+								type: 'number',
+								pattern:'[0-9]*',
+								placeholder: 'Число',
+							});
+							block.appendTo($('.quiz__body'));
+							break;
+						case 'message':
+							var block = $('<div>',{
+								class: 'quiz__output',
+								text: obj.message,
+							});
+							block.appendTo($('.quiz__body'));
+							break;
+					}
+					console.log(obj);
+				};
+			data.pollSize = objSize(data.poll);
+
+			var order = [];
+			for (var key in data.poll) {
+				if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='p') {
+					order.push(key);
+				}
+			}
+
+			order.sort(function(a,b){
+				return(Number(a.substr(1)) - Number(b.substr(1)));
+			});
+
+			// for (var i=0;i<order.length;i++) {
+			// 	console.log(data.poll[order[i]].type);
+			// }
+			renderQuestion(data.poll[order[4]]);
+			// 
+			// Конец работы с JSON
+			// 
+		}).fail(function(){
+			console.log('JSON не загрузился');
+		});
+		// JSONdata.pollSize = objSize;
+		// console.log(JSONdata.pollSize);
+	}
 	function initQuizSelects() {
-		var selects = $('.quiz__select');
+		var selects = $('.quiz__select'),
+			closeAllSelects = function(count) {
+				selects.each(function(i,el) {
+					if(count !== i) {
+						$(el).removeClass('quiz__select_opened');
+					}
+				});
+			};
 
 		selects.each(function(i,el){
 			var select = $(el),
-				input = select.find('.quiz__select-input'),
+				input = select.find('.quiz__hidden-input'),
 				options = select.find('.quiz__select-options-list').find('.quiz__select-option'),
 				btn = select.find('.quiz__select-btn'),
 				closeSelect = function() {
@@ -17,27 +192,19 @@ $(document).ready(function(){
 				},
 				openSelect = function() {
 					select.addClass('quiz__select_opened');
-				},
-				closeAllSelects = function(count) {
-					selects.each(function(c,elem) {
-						if(count !== c) {
-							$(elem).removeClass('quiz__select_opened');
-						}
-					});
 				};
 
-			options.each(function(i,el) {
-				$(el).on('click', function(evt) {
-					var value = $(el).attr('data-value'),
-						text  = $(el).text();
-					evt.preventDefault();
+			options.each(function(iter,elem) {
+				$(elem).off('click.my').on('click.my', function(evt) {
+					var value = $(elem).attr('data-value'),
+						text  = $(elem).text();
 					input.val(value);
 					btn.find('span').text(text);
 					closeSelect();
 				})
 			});
 
-			btn.on('click', function(evt){
+			btn.off('click.my').on('click.my', function(evt){
 				evt.preventDefault();
 				closeAllSelects(i);
 				if (!select.hasClass('quiz__select_opened')) {
@@ -46,19 +213,17 @@ $(document).ready(function(){
 					closeSelect();
 				};
 			});
-			$(document).mouseup(function (evt){
-				if (!select.is(evt.target) && select.has(evt.target).length === 0) { // и не по его дочерним элементам
-					closeSelect();
-				}
-			});
+		});
+
+		$(document).off('click.my').on('click.my', function (evt){
+			if (!selects.is(evt.target) && selects.has(evt.target).length === 0) {
+				closeAllSelects();
+			}
 		});
 	}
 
-	function initQuizCheckboxes() {
-		var radioBtns  = $('.quiz__radio-btns').find('.quiz__hidden-input'),
-			checkboxes = $('.quiz__checkboxes').find('.quiz__hidden-input'),
-			pictures   = $('.quiz__pictures').find('.quiz__hidden-input'),
-			uncheck = function(array,number) {
+	function initQuizCheckboxes(classPart) {
+		var uncheck = function(array,number) {
 				array.each(function(iter,elem){
 					if (iter !== number) {
 						$(elem).parent('label').removeClass($(elem).parent('label')[0].classList[0]+'_checked');
@@ -75,7 +240,7 @@ $(document).ready(function(){
 					});
 
 					array.each(function(i,el){
-						$(el).on('change', function(){
+						$(el).off('change.my').on('change.my', function(){
 							var inputParent   = $(el).parent('label'),
 								parentClass   = inputParent[0].classList[0],
 								checkedClass  = parentClass+'_checked';
@@ -101,10 +266,7 @@ $(document).ready(function(){
 					});
 				}
 			};
-			
-		iterate(radioBtns);
-		iterate(checkboxes);
-		iterate(pictures);
+		iterate($('.quiz__'+classPart).find('.quiz__hidden-input'));
 	}
 
 	function initCheckInput() {
@@ -114,7 +276,7 @@ $(document).ready(function(){
 			field = checkInput.find('.quiz__check-input-field');
 
 
-		btn.on('click', function(){
+		btn.off('click.my').on('click.my', function(){
 			if (field.val()==='') {
 				field.focus();
 			} else {
@@ -123,7 +285,7 @@ $(document).ready(function(){
 			}
 		})
 
-		field.on('keyup', function(evt){
+		field.off('keyup.my').on('keyup.my', function(evt){
 			if (field.val()==='') {
 				checkInput.removeClass('quiz__check-input_checked');
 			} else if (field.val()!==''&&!checkInput.hasClass('quiz__check-input_checked')&&!checkInputParent.hasClass('quiz__radio-btns')) {
@@ -143,7 +305,7 @@ $(document).ready(function(){
 		if ($('.swiper-container').length>0) {
 			var mySwiper = new Swiper ('.swiper-container', {
 				slidesPerView: 'auto',
-				spaceBetween: 20,
+				spaceBetween: 21,
 				direction: 'horizontal',
 				navigation: {
 					nextEl: '.swiper-button-next',

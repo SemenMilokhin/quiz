@@ -43,7 +43,10 @@ body, button, input, textarea {
 	margin: auto;
 	width: 14px;
 	height: 16px;
-	fill: #fff;
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' x='0' y='0' viewBox='0 0 451.846 451.847' fill='%23fff'%3E%3Cpath d='M345.441,248.292L151.154,442.573c-12.359,12.365-32.397,12.365-44.75,0c-12.354-12.354-12.354-32.391,0-44.744L278.318,225.92L106.409,54.017c-12.354-12.359-12.354-32.394,0-44.748c12.354-12.359,32.391-12.359,44.75,0l194.287,194.284c6.177,6.18,9.262,14.271,9.262,22.366C354.708,234.018,351.617,242.115,345.441,248.292z'/%3E%3C/svg%3E");
 }
 .swiper-button-prev .swiper-button-svg {
 	transform: rotate(180deg);
@@ -110,8 +113,6 @@ body, button, input, textarea {
 		&_opened {
 			button {
 				border-radius: 5px 5px 0 0;
-				border-bottom: none;
-				padding-bottom: 15.5px;
 				svg {
 					transform: rotate(180deg);
 				}
@@ -144,7 +145,10 @@ body, button, input, textarea {
 	&__select-btn-svg {
 		width: 16px;
 		height: 16px;
-		fill: $text-color;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: cover;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' x='0' y='0' viewBox='0 0 240.811 240.811' fill='%234d4d4d'%3E%3Cpath d='M220.088,57.667l-99.671,99.695L20.746,57.655c-4.752-4.752-12.439-4.752-17.191,0c-4.74,4.752-4.74,12.451,0,17.203l108.261,108.297l0,0l0,0c4.74,4.752,12.439,4.752,17.179,0L237.256,74.859c4.74-4.752,4.74-12.463,0-17.215C232.528,52.915,224.828,52.915,220.088,57.667z'/%3E%3C/svg%3E");
 	}
 	&__select-options-list {
 		display: none;
@@ -153,14 +157,15 @@ body, button, input, textarea {
 		top: 100%;
 		left: 0;
 		list-style: none;
-		margin: -1px 0 0;
+		margin: 0;
 		padding: 0;
 		background-color: #f7f7f7;
 		width: 100%;
+		max-height: 200px;
+		overflow-y: auto;
 		border: 1px solid rgba(217,216,230,.55);
 		border-radius: 0 0 5px 5px;
 		border-top: none;
-		overflow: hidden;
 	}
 	&__select-option {
 		display: block;
@@ -190,7 +195,7 @@ body, button, input, textarea {
 		padding: 14px 15px;
 	}
 	&__checkbox, &__radio, &__check-input{
-		width: 467px;
+		width: 49%;
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
@@ -353,7 +358,7 @@ body, button, input, textarea {
 		color: $text-color;
 		outline: none;
 	}
-	&__select, &__number, &__textarea {
+	&__number, &__textarea {
 		transition: box-shadow .15s ease-out;
 		&:hover {
 			box-shadow: 0 1px 3px 0 rgba(0,0,0,.1);
@@ -370,7 +375,7 @@ body, button, input, textarea {
 	}
 	&__pic {
 		display: block;
-		width: 180px;
+		width: 174px;
 		border: 1px solid rgba(217,216,230,.55);
 		border-radius: 5px;
 		overflow: hidden;
@@ -594,9 +599,6 @@ body, button, input, textarea {
 		border: none;
 		&__body {
 			margin-bottom: 104px;
-		}
-		&__checkbox, &__radio, &__check-input {
-			width: 48.5%;
 		}
 		&__footer {
 			position: fixed;
