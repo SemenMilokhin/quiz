@@ -19,29 +19,18 @@ $(document).ready(function(){
 					var result = true;
 					switch (obj.type) {
 						case 'radio':
-							if ($('.quiz__hidden-input:checked').length > 0) {
-								console.log($('.quiz__hidden-input:checked'));
-								console.log($('.quiz__hidden-input:checked').length);
-								result = false;
-							}
-							break;
 						case 'checkbox':
-							//
+						case 'pic':
+							if ($('.quiz__hidden-input:checked').length === 0) result = false;
 							break;
 						case 'select':
-							//
-							break;
-						case 'pic':
-							//
+							if($('.quiz__hidden-input').val()==='') result = false;
 							break;
 						case 'text':
-							//
+							if ($('.quiz__textarea').val()==='') result = false;
 							break;
 						case 'num':
-							//
-							break;
-						case 'message':
-							//
+							if ($('.quiz__number').val()==='') result = false;
 							break;
 					}
 					return result;
