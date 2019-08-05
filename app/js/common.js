@@ -1,22 +1,78 @@
 $(document).ready(function(){
 	loadJSON();
 	initQuizSelects();
-	// initQuizCheckboxes();
 	initCheckInput();
-	initSwiper();
 
 	function loadJSON() {
 		$.getJSON('../json/config.json', function(data){
-			var objSize = function(object) {
-					var size = 0;
-					for (var key in object) {
-						if (object.hasOwnProperty(key)) size++;
-					}
-					return size;
+			var initButtons = function() {
+					var buttons = $('.quiz__buttons'),
+						prevBtn = buttons.find('.quiz__btn_prev'),
+						skipBtn = buttons.find('.quiz__btn_skip'),
+						nextBtn = buttons.find('.quiz__btn_next');
+
+					prevBtn.off('click.my').on('click.my', renderPreviousChunk);
+					skipBtn.off('click.my').on('click.my', skipChunk);
+					nextBtn.off('click.my').on('click.my', renderNextChunk);
 				},
+				checkConditions = function(obj) {
+					var result = true;
+					switch (obj.type) {
+						case 'radio':
+							if ($('.quiz__hidden-input:checked').length > 0) {
+								console.log($('.quiz__hidden-input:checked'));
+								console.log($('.quiz__hidden-input:checked').length);
+								result = false;
+							}
+							break;
+						case 'checkbox':
+							//
+							break;
+						case 'select':
+							//
+							break;
+						case 'pic':
+							//
+							break;
+						case 'text':
+							//
+							break;
+						case 'num':
+							//
+							break;
+						case 'message':
+							//
+							break;
+					}
+					return result;
+				}
 				renderQuestion = function(obj) {
-					$('.quiz__title').append(obj.title);
-					$('.quiz__description').append(obj.description);
+					var title = $('.quiz__title'),
+						description = $('.quiz__description'),
+						body = $('.quiz__body'),
+						processLabelValue = $('.quiz__process-label span'),
+						processFieldStyle = $('.quiz__process-field span'),
+						buttons = $('.quiz__buttons'),
+						prevBtn = $('<button>',{
+							class: 'quiz__btn quiz__btn_prev quiz__btn_fill',
+							text: 'Назад',
+							prepend: $('<svg>',{class:'quiz__btn-svg quiz__btn-svg_inverted'}),
+						}),
+						skipBtn = $('<button>',{
+							class: 'quiz__btn quiz__btn_skip',
+							text: 'Пропустить',
+						}),
+						nextBtn = $('<button>',{
+							class: 'quiz__btn quiz__btn_next quiz__btn_fill quiz__btn_blicked',
+							text: 'Далее',
+							append: $('<svg>',{class: 'quiz__btn-svg'}),
+						}),
+						progressPercent = Math.round(100/(data.order.length-1)*(data.currentChunk));
+
+					title.empty().append(obj.title);
+					description.empty().append(obj.description);
+
+					body.empty();
 					switch(obj.type) {
 						case 'radio':
 							var block = $('<div>',{class: 'quiz__radio-btns'});
@@ -144,9 +200,41 @@ $(document).ready(function(){
 							block.appendTo($('.quiz__body'));
 							break;
 					}
-					console.log(obj);
+
+					processLabelValue.empty().append(progressPercent+'%');
+					processFieldStyle.css({width:progressPercent+'%'});
+
+					buttons.empty();
+					if (obj.back === '1') {
+						buttons.append(prevBtn);
+					}
+					if (obj.skip === '1') {
+						buttons.append(skipBtn);
+					}
+					buttons.append(nextBtn);
+					initButtons();
+				},
+				renderPreviousChunk = function() {
+					if (data.currentChunk >= 1 && data.currentChunk < data.order.length) {
+						data.currentChunk-=1;
+						renderQuestion(data.poll[order[data.currentChunk]]);	
+					}
+				}
+				skipChunk = function() {
+					if (data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
+						data.currentChunk+=1;
+						renderQuestion(data.poll[order[data.currentChunk]]);
+					}
+				}
+				renderNextChunk = function() {
+					if (checkConditions(data.poll[order[data.currentChunk]]) && data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
+						data.currentChunk+=1;
+						renderQuestion(data.poll[order[data.currentChunk]]);
+					} else {
+						console.log('Условия для продолжения не соблюдены');
+					}
 				};
-			data.pollSize = objSize(data.poll);
+			data.currentChunk = 0;
 
 			var order = [];
 			for (var key in data.poll) {
@@ -154,15 +242,18 @@ $(document).ready(function(){
 					order.push(key);
 				}
 			}
-
 			order.sort(function(a,b){
 				return(Number(a.substr(1)) - Number(b.substr(1)));
 			});
+			data.order = order;
 
-			// for (var i=0;i<order.length;i++) {
-			// 	console.log(data.poll[order[i]].type);
-			// }
-			renderQuestion(data.poll[order[4]]);
+			renderQuestion(data.poll[order[data.currentChunk]]);
+			initButtons();
+
+			
+			
+
+
 			// 
 			// Конец работы с JSON
 			// 
