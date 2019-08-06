@@ -346,7 +346,7 @@ body, button, input, textarea {
 		display: block;
 		flex-shrink: 9999;
 	}
-	&__number, &__textarea, &__output {
+	&__additional-field, &__number, &__textarea, &__output {
 		display: block;
 		width: 100%;
 		background-color: #f7f7f7;
@@ -358,7 +358,7 @@ body, button, input, textarea {
 		color: $text-color;
 		outline: none;
 	}
-	&__number, &__textarea {
+	&__number, &__textarea, &__additional-field {
 		transition: box-shadow .15s ease-out;
 		&:hover {
 			box-shadow: 0 1px 3px 0 rgba(0,0,0,.1);

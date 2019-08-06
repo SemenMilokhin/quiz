@@ -1,7 +1,5 @@
 $(document).ready(function(){
 	loadJSON();
-	initQuizSelects();
-	initCheckInput();
 
 	function loadJSON() {
 		$.getJSON('../json/config.json', function(data){
@@ -52,11 +50,20 @@ $(document).ready(function(){
 									obj.answer.push(object);
 								});
 							}
+							var textAnswer = $('.quiz__additional-field');
+							if (textAnswer.length>0&&textAnswer.val()!=='') {
+								obj.textAnswer = textAnswer.val();
+							}
 							break;
 						case 'select':
 							var answerValue = $('.quiz__hidden-input').val();
 							obj.answer = {};
 							obj.answer[answerValue] = obj.poll[answerValue];
+
+							var textAnswer = $('.quiz__additional-field');
+							if (textAnswer.length>0&&textAnswer.val()!=='') {
+								obj.textAnswer = textAnswer.val();
+							}
 							break;
 						case 'num':
 							var answerValue = $('.quiz__number').val();
@@ -66,9 +73,6 @@ $(document).ready(function(){
 							var answerValue = $('.quiz__textarea').val();
 							obj.answer = answerValue;
 							break;
-					}
-					if (obj.answer !== undefined) {
-						console.log (obj.answer);
 					}
 				},
 				checkNextSubChunk = function(obj) {
@@ -106,11 +110,6 @@ $(document).ready(function(){
 							append: $('<svg>',{class: 'quiz__btn-svg'}),
 						}),
 						progressPercent = Math.round(100/(data.order.length-1)*(data.currentChunk));
-					
-					if (obj.text !== undefined) {
-						if (obj.text.length>0) alert('Есть дополнительное текстовое поле');
-					}
-					
 
 					title.empty().append(obj.title);
 					description.empty().append(obj.description);
@@ -166,6 +165,14 @@ $(document).ready(function(){
 								}
 							}
 							block.appendTo('.quiz__body');
+							if (obj.textAnswer !== undefined) {
+								$('.quiz__body').append($('<input>',{
+									class: 'quiz__additional-field',
+									type: 'text',
+									placeholder: 'Вы можете дополнить свой ответ',
+									val: obj.textAnswer,
+								}));
+							}
 							initQuizCheckboxes('radio-btns');
 							break;
 						case 'checkbox':
@@ -256,6 +263,14 @@ $(document).ready(function(){
 								}
 							}
 							block.appendTo('.quiz__body');
+							if (obj.textAnswer !== undefined) {
+								$('.quiz__body').append($('<input>',{
+									class: 'quiz__additional-field',
+									type: 'text',
+									placeholder: 'Вы можете дополнить свой ответ',
+									val: obj.textAnswer,
+								}));
+							}
 							initQuizCheckboxes('checkboxes');
 							break;
 						case 'select':
@@ -300,6 +315,14 @@ $(document).ready(function(){
 								});
 							}
 							block.appendTo('.quiz__body');
+							if (obj.textAnswer !== undefined) {
+								$('.quiz__body').append($('<input>',{
+									class: 'quiz__additional-field',
+									type: 'text',
+									placeholder: 'Вы можете дополнить свой ответ',
+									val: obj.textAnswer,
+								}));
+							}
 							initQuizSelects();
 							break;
 						case 'pic':
@@ -393,6 +416,14 @@ $(document).ready(function(){
 								.add($('<div>',{class:'swiper-scrollbar'})),
 							});
 							block.appendTo('.quiz__body');
+							if (obj.textAnswer !== undefined) {
+								$('.quiz__body').append($('<input>',{
+									class: 'quiz__additional-field',
+									type: 'text',
+									placeholder: 'Вы можете дополнить свой ответ',
+									val: obj.textAnswer,
+								}));
+							}
 							initQuizCheckboxes('pictures');
 							initSwiper();
 							break;
@@ -455,6 +486,53 @@ $(document).ready(function(){
 						buttons.append(nextBtn);
 					}
 					initButtons();
+
+					if (obj.text !== undefined && obj.text.length>0) {
+						switch(obj.type) {
+							case 'checkbox':
+							case 'radio':
+							case 'pic':
+								var inputs = $('.quiz__hidden-input');
+								inputs.each(function(i,el){
+									$(el).off('change.text').on('change.text',function(){
+										var count = 0;
+										$('.quiz__hidden-input:checked').each(function(iter,elem){
+											for (var j=0;j<obj.text.length;j++) {
+												if($(elem).val()===obj.text[j]) count++;
+											}
+										});
+										if (count>0&&$('.quiz__additional-field').length===0) {
+											$('.quiz__body').append($('<input>',{
+												class: 'quiz__additional-field',
+												type: 'text',
+												placeholder: 'Вы можете дополнить свой ответ',
+											}));
+										} else if (count===0&&$('.quiz__additional-field').length>0) {
+											$('.quiz__additional-field').remove();
+										}
+									});
+								});
+								break;
+							case 'select':
+								var input = $('.quiz__hidden-input');
+								input.off('change.text').on('change.text', function(){
+									var flag = false;
+									for (var i=0;i<obj.text.length;i++) {
+										if(input.val()===obj.text[i]) flag = true;
+									}
+									if (flag&&$('.quiz__additional-field').length===0) {
+										$('.quiz__body').append($('<input>',{
+											class: 'quiz__additional-field',
+											type: 'text',
+											placeholder: 'Вы можете дополнить свой ответ',
+										}));
+									} else if (!flag&&$('.quiz__additional-field').length>0) {
+										$('.quiz__additional-field').remove();
+									}
+								});
+								break;
+						}
+					}
 				},
 				renderPreviousChunk = function() {
 					if (data.isSubChunk) {
@@ -518,8 +596,6 @@ $(document).ready(function(){
 
 			renderQuestion(data.poll[order[data.currentChunk]]);
 			initButtons();
-
-			console.log(data.subQuestions)
 			
 
 
@@ -559,6 +635,7 @@ $(document).ready(function(){
 					var value = $(elem).attr('data-value'),
 						text  = $(elem).text();
 					input.val(value);
+					input.trigger('change');
 					btn.find('span').text(text);
 					closeSelect();
 				})
@@ -627,38 +704,6 @@ $(document).ready(function(){
 				}
 			};
 		iterate($('.quiz__'+classPart).find('.quiz__hidden-input'));
-	}
-
-	function initCheckInput() {
-		var checkInput = $('.quiz__check-input'),
-			checkInputParent = checkInput.parent('div'),
-			btn = checkInput.find('.quiz__check-input-point'),
-			field = checkInput.find('.quiz__check-input-field');
-
-
-		btn.off('click.my').on('click.my', function(){
-			if (field.val()==='') {
-				field.focus();
-			} else {
-				field.val('');
-				checkInput.removeClass('quiz__check-input_checked');
-			}
-		})
-
-		field.off('keyup.my').on('keyup.my', function(evt){
-			if (field.val()==='') {
-				checkInput.removeClass('quiz__check-input_checked');
-			} else if (field.val()!==''&&!checkInput.hasClass('quiz__check-input_checked')&&!checkInputParent.hasClass('quiz__radio-btns')) {
-				checkInput.addClass('quiz__check-input_checked');
-			} else if (field.val()!==''&&!checkInput.hasClass('quiz__check-input_checked')&&checkInputParent.hasClass('quiz__radio-btns')) {
-				checkInputParent.find('.quiz__hidden-input').each(function(i,el){
-					if ($(el).prop('checked')) {
-						$(el).prop('checked',false).change();
-					}
-				});
-				checkInput.addClass('quiz__check-input_checked');
-			}
-		});
 	}
 
 	function initSwiper() {
