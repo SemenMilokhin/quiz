@@ -34,7 +34,56 @@ $(document).ready(function(){
 							break;
 					}
 					return result;
-				}
+				},
+				addAnswers = function(obj) {
+					switch (obj.type) {
+						case 'radio':
+						case 'checkbox':
+						case 'pic':
+							var answerFields = $('.quiz__hidden-input:checked');
+							if (answerFields.length === 1) {
+								obj.answer = {};
+								obj.answer[answerFields.val()] = obj.poll[answerFields.val()];
+							} else if (answerFields.length > 1) {
+								obj.answer = [];
+								answerFields.each(function(i,el){
+									var object = {}
+									object[$(el).val()] = obj.poll[$(el).val()];
+									obj.answer.push(object);
+								});
+							}
+							break;
+						case 'select':
+							var answerValue = $('.quiz__hidden-input').val();
+							obj.answer = {};
+							obj.answer[answerValue] = obj.poll[answerValue];
+							break;
+						case 'num':
+							var answerValue = $('.quiz__number').val();
+							obj.answer = answerValue;
+							break;
+						case 'text':
+							var answerValue = $('.quiz__textarea').val();
+							obj.answer = answerValue;
+							break;
+					}
+					if (obj.answer !== undefined) {
+						console.log (obj.answer);
+					}
+				},
+				checkNextSubChunk = function(obj) {
+					var result = '';
+					if (obj.type==='radio'||obj.type==='select'||obj.type==='pic') {
+						for (var answerKey in obj.answer) {
+							for (var i=0;i<data.subQuestions.length;i++) {
+								if (answerKey.substr(2)===data.subQuestions[i].substr(1)) {
+									result = data.subQuestions[i];
+								}
+							}
+						}
+					}
+					return result;
+				},
 				renderQuestion = function(obj) {
 					var title = $('.quiz__title'),
 						description = $('.quiz__description'),
@@ -57,6 +106,11 @@ $(document).ready(function(){
 							append: $('<svg>',{class: 'quiz__btn-svg'}),
 						}),
 						progressPercent = Math.round(100/(data.order.length-1)*(data.currentChunk));
+					
+					if (obj.text !== undefined) {
+						if (obj.text.length>0) alert('Есть дополнительное текстовое поле');
+					}
+					
 
 					title.empty().append(obj.title);
 					description.empty().append(obj.description);
@@ -65,42 +119,147 @@ $(document).ready(function(){
 					switch(obj.type) {
 						case 'radio':
 							var block = $('<div>',{class: 'quiz__radio-btns'});
-							for (var key in obj.poll) {
-								block.append($('<label>',{
-									class: 'quiz__radio',
-									append: $('<input>',{
-										class: 'quiz__hidden-input',
-										type: 'radio',
-										val: key,
-										name: 'radio-group'
-									})
-									.add($('<span>',{class:'quiz__radio-point'}))
-									.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
-								}));
+							if (obj.answer !== undefined) {
+								for (var key in obj.poll) {
+									for (var answerKey in obj.answer) {
+										if (answerKey === key) {
+											block.append($('<label>',{
+												class: 'quiz__radio',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'radio',
+													val: key,
+													checked: 'checked',
+													name: 'radio-group'
+												})
+												.add($('<span>',{class:'quiz__radio-point'}))
+												.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+											}));
+										} else {
+											block.append($('<label>',{
+												class: 'quiz__radio',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'radio',
+													val: key,
+													name: 'radio-group'
+												})
+												.add($('<span>',{class:'quiz__radio-point'}))
+												.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+											}));
+										}
+									}
+								}
+							} else {
+								for (var key in obj.poll) {
+									block.append($('<label>',{
+										class: 'quiz__radio',
+										append: $('<input>',{
+											class: 'quiz__hidden-input',
+											type: 'radio',
+											val: key,
+											name: 'radio-group'
+										})
+										.add($('<span>',{class:'quiz__radio-point'}))
+										.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+									}));
+								}
 							}
 							block.appendTo('.quiz__body');
 							initQuizCheckboxes('radio-btns');
 							break;
 						case 'checkbox':
 							var block = $('<div>',{class: 'quiz__checkboxes'});
-							for (var key in obj.poll) {
-								block.append($('<label>',{
-									class: 'quiz__checkbox',
-									append: $('<input>',{
-										class: 'quiz__hidden-input',
-										type: 'checkbox',
-										val: key,
-										name: 'checkbox-group'
-									})
-									.add($('<span>',{class:'quiz__checkbox-point'}))
-									.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
-								}));
+							if (obj.answer !== undefined) {
+								if (obj.answer.length===undefined) {
+									for (var key in obj.poll) {
+										for (var answerKey in obj.answer) {
+											if (answerKey === key) {
+												block.append($('<label>',{
+													class: 'quiz__checkbox',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'checkbox',
+														checked: 'checked',
+														val: key,
+														name: 'checkbox-group'
+													})
+													.add($('<span>',{class:'quiz__checkbox-point'}))
+													.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+												}));
+											} else {
+												block.append($('<label>',{
+													class: 'quiz__checkbox',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'checkbox',
+														val: key,
+														name: 'checkbox-group'
+													})
+													.add($('<span>',{class:'quiz__checkbox-point'}))
+													.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+												}));
+											}
+										}
+									}
+								} else if (obj.answer.length>0) {
+									for (var key in obj.poll) {
+										var isCheked = false
+										for (var i = 0; i < obj.answer.length; i++) {
+											for (var answerKey in obj.answer[i]) {
+												if (answerKey === key) {
+													isCheked = true;
+												}
+											}
+										}
+										if (isCheked) {
+											block.append($('<label>',{
+												class: 'quiz__checkbox',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'checkbox',
+													checked: 'checked',
+													val: key,
+													name: 'checkbox-group'
+												})
+												.add($('<span>',{class:'quiz__checkbox-point'}))
+												.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+											}));
+										} else {
+											block.append($('<label>',{
+												class: 'quiz__checkbox',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'checkbox',
+													val: key,
+													name: 'checkbox-group'
+												})
+												.add($('<span>',{class:'quiz__checkbox-point'}))
+												.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+											}));
+										}
+									}
+								}
+							} else {
+								for (var key in obj.poll) {
+									block.append($('<label>',{
+										class: 'quiz__checkbox',
+										append: $('<input>',{
+											class: 'quiz__hidden-input',
+											type: 'checkbox',
+											val: key,
+											name: 'checkbox-group'
+										})
+										.add($('<span>',{class:'quiz__checkbox-point'}))
+										.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+									}));
+								}
 							}
 							block.appendTo('.quiz__body');
 							initQuizCheckboxes('checkboxes');
 							break;
 						case 'select':
-							var list = $('<ul>',{class: 'quiz__select-options-list'});
+							var list = $('<ul>',{class: 'quiz__select-options-list'}),block;
 							for (var key in obj.poll) {
 								list.append($('<li>',{
 									class: 'quiz__select-option',
@@ -108,46 +267,118 @@ $(document).ready(function(){
 									text: obj.poll[key]
 								}));
 							}
-							var block = $('<div>',{
-								class: 'quiz__select',
-								append: $('<button>',{
-									class: 'quiz__select-btn',
-									append: $('<span>',{text:'Выберите значение из списка'})
-										.add($('<svg>',{class: 'quiz__select-btn-svg',})),
-								})
-								.add(list)
-								.add($('<input>',{
-									class: 'quiz__hidden-input',
-									type: 'text',
-								})),
-							});
+							if (obj.answer !== undefined) {
+								for (var answerKey in obj.answer) {
+									block = $('<div>',{
+										class: 'quiz__select',
+										append: $('<button>',{
+											class: 'quiz__select-btn',
+											append: $('<span>',{text: obj.poll[answerKey]})
+												.add($('<svg>',{class: 'quiz__select-btn-svg',})),
+										})
+										.add(list)
+										.add($('<input>',{
+											class: 'quiz__hidden-input',
+											type: 'text',
+											val: answerKey,
+										})),
+									});
+								}
+							} else {
+								block = $('<div>',{
+									class: 'quiz__select',
+									append: $('<button>',{
+										class: 'quiz__select-btn',
+										append: $('<span>',{text:'Выберите значение из списка'})
+											.add($('<svg>',{class: 'quiz__select-btn-svg',})),
+									})
+									.add(list)
+									.add($('<input>',{
+										class: 'quiz__hidden-input',
+										type: 'text',
+									})),
+								});
+							}
 							block.appendTo('.quiz__body');
 							initQuizSelects();
 							break;
 						case 'pic':
 							var pictures = $('<div>',{class: 'quiz__pictures swiper-wrapper'});
-							for (var key in obj.poll) {
-								pictures.append($('<label>',{
-									class: 'quiz__pic swiper-slide',
-									append: $('<input>',{
-										class: 'quiz__hidden-input',
-										type: 'radio',
-										val: key,
-										name: 'pictures-group'
-									})
-									.add($('<div>',{
-										class: 'quiz__pic-img-wrapper',
-										append: $('<img>',{
-											class: 'quiz__pic-img',
-											src: obj.pic[key],
-											alt: obj.poll[key],
-										}),
-									}))
-									.add($('<div>',{
-										class:'quiz__pic-label',
-										text: obj.poll[key],
-									})),
-								}));
+							if (obj.answer !== undefined) {
+								for (var key in obj.poll) {
+									for (var answerKey in obj.answer) {
+										if (answerKey === key) {
+											pictures.append($('<label>',{
+												class: 'quiz__pic swiper-slide',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'radio',
+													checked: 'checked',
+													val: key,
+													name: 'pictures-group'
+												})
+												.add($('<div>',{
+													class: 'quiz__pic-img-wrapper',
+													append: $('<img>',{
+														class: 'quiz__pic-img',
+														src: obj.pic[key],
+														alt: obj.poll[key],
+													}),
+												}))
+												.add($('<div>',{
+													class:'quiz__pic-label',
+													text: obj.poll[key],
+												})),
+											}));
+										} else {
+											pictures.append($('<label>',{
+												class: 'quiz__pic swiper-slide',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'radio',
+													val: key,
+													name: 'pictures-group'
+												})
+												.add($('<div>',{
+													class: 'quiz__pic-img-wrapper',
+													append: $('<img>',{
+														class: 'quiz__pic-img',
+														src: obj.pic[key],
+														alt: obj.poll[key],
+													}),
+												}))
+												.add($('<div>',{
+													class:'quiz__pic-label',
+													text: obj.poll[key],
+												})),
+											}));
+										}
+									} 
+								}
+							} else {
+								for (var key in obj.poll) {
+									pictures.append($('<label>',{
+										class: 'quiz__pic swiper-slide',
+										append: $('<input>',{
+											class: 'quiz__hidden-input',
+											type: 'radio',
+											val: key,
+											name: 'pictures-group'
+										})
+										.add($('<div>',{
+											class: 'quiz__pic-img-wrapper',
+											append: $('<img>',{
+												class: 'quiz__pic-img',
+												src: obj.pic[key],
+												alt: obj.poll[key],
+											}),
+										}))
+										.add($('<div>',{
+											class:'quiz__pic-label',
+											text: obj.poll[key],
+										})),
+									}));
+								}
 							}
 							var block = $('<div>',{
 								class: 'swiper-container',
@@ -166,19 +397,39 @@ $(document).ready(function(){
 							initSwiper();
 							break;
 						case 'text':
-							var block = $('<textarea>',{
-								class: 'quiz__textarea',
-								placeholder: 'Введите текст'
-							});
+							var block;
+							if (obj.answer!==undefined) {
+								block = $('<textarea>',{
+									class: 'quiz__textarea',
+									placeholder: 'Введите текст',
+									val: obj.answer,
+								});
+							} else {
+								block = $('<textarea>',{
+									class: 'quiz__textarea',
+									placeholder: 'Введите текст'
+								});
+							}
 							block.appendTo($('.quiz__body'));
 							break;
 						case 'num':
-							var block = $('<input>',{
-								class: 'quiz__number',
-								type: 'number',
-								pattern:'[0-9]*',
-								placeholder: 'Число',
-							});
+							var block;
+							if (obj.answer!==undefined) {
+								block = $('<input>',{
+									class: 'quiz__number',
+									type: 'number',
+									pattern:'[0-9]*',
+									placeholder: 'Число',
+									val: obj.answer,
+								});
+							} else {
+								block = $('<input>',{
+									class: 'quiz__number',
+									type: 'number',
+									pattern:'[0-9]*',
+									placeholder: 'Число',
+								});
+							}
 							block.appendTo($('.quiz__body'));
 							break;
 						case 'message':
@@ -194,19 +445,25 @@ $(document).ready(function(){
 					processFieldStyle.css({width:progressPercent+'%'});
 
 					buttons.empty();
-					if (obj.back === '1') {
+					if (obj !== data.poll[order[0]] && obj.back === '1') {
 						buttons.append(prevBtn);
 					}
 					if (obj.skip === '1') {
 						buttons.append(skipBtn);
 					}
-					buttons.append(nextBtn);
+					if (obj !== data.poll[order[data.order.length-1]]) {
+						buttons.append(nextBtn);
+					}
 					initButtons();
 				},
 				renderPreviousChunk = function() {
-					if (data.currentChunk >= 1 && data.currentChunk < data.order.length) {
+					if (data.isSubChunk) {
+						renderQuestion(data.poll[order[data.currentChunk]]);
+						data.isSubChunk = false;
+						data.currentSubChunk = '';
+					} else if (data.currentChunk >= 1 && data.currentChunk < data.order.length) {
 						data.currentChunk-=1;
-						renderQuestion(data.poll[order[data.currentChunk]]);	
+						renderQuestion(data.poll[order[data.currentChunk]]);
 					}
 				}
 				skipChunk = function() {
@@ -216,30 +473,53 @@ $(document).ready(function(){
 					}
 				}
 				renderNextChunk = function() {
-					if (checkConditions(data.poll[order[data.currentChunk]]) && data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
-						data.currentChunk+=1;
-						renderQuestion(data.poll[order[data.currentChunk]]);
+					if (data.isSubChunk) {
+						if (checkConditions(data.poll[data.currentSubChunk]) && data.currentChunk < data.order.length-1) {
+							addAnswers(data.poll[data.currentSubChunk]);
+							data.currentChunk+=1;
+							renderQuestion(data.poll[order[data.currentChunk]]);
+							data.isSubChunk = false;
+							data.currentSubChunk = '';
+						}
+					} else if (checkConditions(data.poll[order[data.currentChunk]]) && data.currentChunk < data.order.length-1) {
+						addAnswers(data.poll[order[data.currentChunk]]);
+						var nextSubChunk = checkNextSubChunk(data.poll[order[data.currentChunk]]);
+						if (nextSubChunk!=='') {
+							renderQuestion(data.poll[nextSubChunk]);
+							data.isSubChunk = true;
+							data.currentSubChunk = nextSubChunk;
+						} else {
+							data.currentChunk+=1;
+							renderQuestion(data.poll[order[data.currentChunk]]);
+						}	
 					} else {
-						console.log('Условия для продолжения не соблюдены');
+						alert('Условия для продолжения не соблюдены');
 					}
 				};
 			data.currentChunk = 0;
+			data.currentSubChunk = '';
+			data.isSubChunk = false;
 
 			var order = [];
+			var subQuestions = [];
 			for (var key in data.poll) {
 				if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='p') {
 					order.push(key);
+				} else if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='r') {
+					subQuestions.push(key);
 				}
 			}
 			order.sort(function(a,b){
 				return(Number(a.substr(1)) - Number(b.substr(1)));
 			});
 			data.order = order;
+			data.subQuestions = subQuestions;
+
 
 			renderQuestion(data.poll[order[data.currentChunk]]);
 			initButtons();
 
-			
+			console.log(data.subQuestions)
 			
 
 
