@@ -81,17 +81,19 @@ $(document).ready(function(){
 						case 'pic':
 						case 'select':
 							for (var answerKey in obj.answer) {
+								for (var i=data.currentChunk+1;i<data.order.length;i++) {
+									if (data.order[i].substr(0,1)==='r') {
+										console.log(data.order[i]);
+										data.order.splice(i, 1);
+										i--;
+									}
+								}
 								for (var i=0;i<data.subQuestions.length;i++) {
-									if (answerKey.substr(2)===data.subQuestions[i].substr(1)) { //если нужно добавить подвопрос в очередь
+									if (answerKey.substr(2)===data.subQuestions[i].substr(1)) {
 										var flag = true;
 										for (var j = 0;j<data.order.length;j++) {
 											if (data.order[j]===data.subQuestions[i]) {
 												flag = false;
-											}
-										}
-										for (var k = 0;k<data.subQuestions.length;k++) {
-											if (data.order[data.currentChunk+1]===data.subQuestions[k]&&data.order[data.currentChunk+1]!==data.subQuestions[i]) {
-												data.order.splice(data.currentChunk+1, 1)
 											}
 										}
 										if (flag) {
@@ -137,100 +139,146 @@ $(document).ready(function(){
 							break;
 					}
 				},
-				renderQuestion = function(obj) {
-					var title = $('.quiz__title'),
-						description = $('.quiz__description'),
-						body = $('.quiz__body'),
-						processLabelValue = $('.quiz__process-label span'),
-						processFieldStyle = $('.quiz__process-field span'),
-						buttons = $('.quiz__buttons'),
-						prevBtn = $('<button>',{
-							class: 'quiz__btn quiz__btn_prev quiz__btn_fill',
-							text: 'Назад',
-							prepend: $('<svg>',{class:'quiz__btn-svg quiz__btn-svg_inverted'}),
-						}),
-						skipBtn = $('<button>',{
-							class: 'quiz__btn quiz__btn_skip',
-							text: 'Пропустить',
-						}),
-						nextBtn = $('<button>',{
-							class: 'quiz__btn quiz__btn_next quiz__btn_fill quiz__btn_blicked',
-							text: 'Далее',
-							append: $('<svg>',{class: 'quiz__btn-svg'}),
-						}),
-						progressPercent = Math.round(100/(data.order.length-1)*(data.currentChunk));
-
-					title.empty().append(obj.title);
-					description.empty().append(obj.description);
-
-					body.empty();
-					switch(obj.type) {
-						case 'radio':
-							var block = $('<div>',{class: 'quiz__radio-btns'});
-							if (obj.answer !== undefined) {
-								for (var key in obj.poll) {
-									for (var answerKey in obj.answer) {
-										if (answerKey === key) {
-											block.append($('<label>',{
-												class: 'quiz__radio',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'radio',
-													val: key,
-													checked: 'checked',
-													name: 'radio-group'
-												})
-												.add($('<span>',{class:'quiz__radio-point'}))
-												.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
-											}));
-										} else {
-											block.append($('<label>',{
-												class: 'quiz__radio',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'radio',
-													val: key,
-													name: 'radio-group'
-												})
-												.add($('<span>',{class:'quiz__radio-point'}))
-												.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
-											}));
-										}
-									}
-								}
-							} else {
-								for (var key in obj.poll) {
-									block.append($('<label>',{
-										class: 'quiz__radio',
-										append: $('<input>',{
-											class: 'quiz__hidden-input',
-											type: 'radio',
-											val: key,
-											name: 'radio-group'
-										})
-										.add($('<span>',{class:'quiz__radio-point'}))
-										.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
-									}));
-								}
-							}
-							block.appendTo('.quiz__body');
-							if (obj.textAnswer !== undefined) {
-								$('.quiz__body').append($('<input>',{
-									class: 'quiz__additional-field',
-									type: 'text',
-									placeholder: 'Вы можете дополнить свой ответ',
-									val: obj.textAnswer,
-								}));
-							}
-							initQuizCheckboxes('radio-btns');
-							break;
-						case 'checkbox':
-							var block = $('<div>',{class: 'quiz__checkboxes'});
-							if (obj.answer !== undefined) {
-								if (obj.answer.length===undefined) {
+				renderQuestion = function(obj,direction) {
+					var factor = 1;
+					if (direction==='right') {
+						factor = -1;
+					}
+					$('.quiz__body').css({
+						opacity: 0,
+						transform: 'translateX('+(-100*factor)+'px)',
+						transition: 'all 0.2s ease'
+					});
+					setTimeout(function(){
+						var title = $('.quiz__title'),
+							description = $('.quiz__description'),
+							body = $('.quiz__body'),
+							processLabelValue = $('.quiz__process-label span'),
+							processFieldStyle = $('.quiz__process-field span'),
+							buttons = $('.quiz__buttons'),
+							prevBtn = $('<button>',{
+								class: 'quiz__btn quiz__btn_prev quiz__btn_fill',
+								text: 'Назад',
+								prepend: $('<svg>',{class:'quiz__btn-svg quiz__btn-svg_inverted'}),
+							}),
+							skipBtn = $('<button>',{
+								class: 'quiz__btn quiz__btn_skip',
+								text: 'Пропустить',
+							}),
+							nextBtn = $('<button>',{
+								class: 'quiz__btn quiz__btn_next quiz__btn_fill quiz__btn_blicked',
+								text: 'Далее',
+								append: $('<svg>',{class: 'quiz__btn-svg'}),
+							}),
+							progressPercent = Math.round(100/(data.order.length-1)*(data.currentChunk));
+						title.empty().append(obj.title);
+						description.empty().append(obj.description);
+						body.empty();
+						switch(obj.type) {
+							case 'radio':
+								var block = $('<div>',{class: 'quiz__radio-btns'});
+								if (obj.answer !== undefined) {
 									for (var key in obj.poll) {
 										for (var answerKey in obj.answer) {
 											if (answerKey === key) {
+												block.append($('<label>',{
+													class: 'quiz__radio',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'radio',
+														val: key,
+														checked: 'checked',
+														name: 'radio-group'
+													})
+													.add($('<span>',{class:'quiz__radio-point'}))
+													.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+												}));
+											} else {
+												block.append($('<label>',{
+													class: 'quiz__radio',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'radio',
+														val: key,
+														name: 'radio-group'
+													})
+													.add($('<span>',{class:'quiz__radio-point'}))
+													.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+												}));
+											}
+										}
+									}
+								} else {
+									for (var key in obj.poll) {
+										block.append($('<label>',{
+											class: 'quiz__radio',
+											append: $('<input>',{
+												class: 'quiz__hidden-input',
+												type: 'radio',
+												val: key,
+												name: 'radio-group'
+											})
+											.add($('<span>',{class:'quiz__radio-point'}))
+											.add($('<span>',{class:'quiz__radio-label',text:obj.poll[key]})),
+										}));
+									}
+								}
+								block.appendTo('.quiz__body');
+								if (obj.textAnswer !== undefined) {
+									$('.quiz__body').append($('<input>',{
+										class: 'quiz__additional-field',
+										type: 'text',
+										placeholder: 'Вы можете дополнить свой ответ',
+										val: obj.textAnswer,
+									}));
+								}
+								initQuizCheckboxes('radio-btns');
+								break;
+							case 'checkbox':
+								var block = $('<div>',{class: 'quiz__checkboxes'});
+								if (obj.answer !== undefined) {
+									if (obj.answer.length===undefined) {
+										for (var key in obj.poll) {
+											for (var answerKey in obj.answer) {
+												if (answerKey === key) {
+													block.append($('<label>',{
+														class: 'quiz__checkbox',
+														append: $('<input>',{
+															class: 'quiz__hidden-input',
+															type: 'checkbox',
+															checked: 'checked',
+															val: key,
+															name: 'checkbox-group'
+														})
+														.add($('<span>',{class:'quiz__checkbox-point'}))
+														.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+													}));
+												} else {
+													block.append($('<label>',{
+														class: 'quiz__checkbox',
+														append: $('<input>',{
+															class: 'quiz__hidden-input',
+															type: 'checkbox',
+															val: key,
+															name: 'checkbox-group'
+														})
+														.add($('<span>',{class:'quiz__checkbox-point'}))
+														.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+													}));
+												}
+											}
+										}
+									} else if (obj.answer.length>0) {
+										for (var key in obj.poll) {
+											var isCheked = false
+											for (var i = 0; i < obj.answer.length; i++) {
+												for (var answerKey in obj.answer[i]) {
+													if (answerKey === key) {
+														isCheked = true;
+													}
+												}
+											}
+											if (isCheked) {
 												block.append($('<label>',{
 													class: 'quiz__checkbox',
 													append: $('<input>',{
@@ -258,341 +306,319 @@ $(document).ready(function(){
 											}
 										}
 									}
-								} else if (obj.answer.length>0) {
+								} else {
 									for (var key in obj.poll) {
-										var isCheked = false
-										for (var i = 0; i < obj.answer.length; i++) {
-											for (var answerKey in obj.answer[i]) {
-												if (answerKey === key) {
-													isCheked = true;
-												}
-											}
-										}
-										if (isCheked) {
-											block.append($('<label>',{
-												class: 'quiz__checkbox',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'checkbox',
-													checked: 'checked',
-													val: key,
-													name: 'checkbox-group'
-												})
-												.add($('<span>',{class:'quiz__checkbox-point'}))
-												.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
-											}));
-										} else {
-											block.append($('<label>',{
-												class: 'quiz__checkbox',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'checkbox',
-													val: key,
-													name: 'checkbox-group'
-												})
-												.add($('<span>',{class:'quiz__checkbox-point'}))
-												.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
-											}));
-										}
+										block.append($('<label>',{
+											class: 'quiz__checkbox',
+											append: $('<input>',{
+												class: 'quiz__hidden-input',
+												type: 'checkbox',
+												val: key,
+												name: 'checkbox-group'
+											})
+											.add($('<span>',{class:'quiz__checkbox-point'}))
+											.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+										}));
 									}
 								}
-							} else {
-								for (var key in obj.poll) {
-									block.append($('<label>',{
-										class: 'quiz__checkbox',
-										append: $('<input>',{
-											class: 'quiz__hidden-input',
-											type: 'checkbox',
-											val: key,
-											name: 'checkbox-group'
-										})
-										.add($('<span>',{class:'quiz__checkbox-point'}))
-										.add($('<span>',{class:'quiz__checkbox-label',text:obj.poll[key]})),
+								block.appendTo('.quiz__body');
+								if (obj.textAnswer !== undefined) {
+									$('.quiz__body').append($('<input>',{
+										class: 'quiz__additional-field',
+										type: 'text',
+										placeholder: 'Вы можете дополнить свой ответ',
+										val: obj.textAnswer,
 									}));
 								}
-							}
-							block.appendTo('.quiz__body');
-							if (obj.textAnswer !== undefined) {
-								$('.quiz__body').append($('<input>',{
-									class: 'quiz__additional-field',
-									type: 'text',
-									placeholder: 'Вы можете дополнить свой ответ',
-									val: obj.textAnswer,
-								}));
-							}
-							initQuizCheckboxes('checkboxes');
-							break;
-						case 'select':
-							var list = $('<ul>',{class: 'quiz__select-options-list'}),block;
-							for (var key in obj.poll) {
-								list.append($('<li>',{
-									class: 'quiz__select-option',
-									'data-value': key,
-									text: obj.poll[key]
-								}));
-							}
-							if (obj.answer !== undefined) {
-								for (var answerKey in obj.answer) {
+								initQuizCheckboxes('checkboxes');
+								break;
+							case 'select':
+								var list = $('<ul>',{class: 'quiz__select-options-list'}),block;
+								for (var key in obj.poll) {
+									list.append($('<li>',{
+										class: 'quiz__select-option',
+										'data-value': key,
+										text: obj.poll[key]
+									}));
+								}
+								if (obj.answer !== undefined) {
+									for (var answerKey in obj.answer) {
+										block = $('<div>',{
+											class: 'quiz__select',
+											append: $('<button>',{
+												class: 'quiz__select-btn',
+												append: $('<span>',{text: obj.poll[answerKey]})
+													.add($('<svg>',{class: 'quiz__select-btn-svg',})),
+											})
+											.add(list)
+											.add($('<input>',{
+												class: 'quiz__hidden-input',
+												type: 'text',
+												val: answerKey,
+											})),
+										});
+									}
+								} else {
 									block = $('<div>',{
 										class: 'quiz__select',
 										append: $('<button>',{
 											class: 'quiz__select-btn',
-											append: $('<span>',{text: obj.poll[answerKey]})
+											append: $('<span>',{text:'Выберите значение из списка'})
 												.add($('<svg>',{class: 'quiz__select-btn-svg',})),
 										})
 										.add(list)
 										.add($('<input>',{
 											class: 'quiz__hidden-input',
 											type: 'text',
-											val: answerKey,
 										})),
 									});
 								}
-							} else {
-								block = $('<div>',{
-									class: 'quiz__select',
-									append: $('<button>',{
-										class: 'quiz__select-btn',
-										append: $('<span>',{text:'Выберите значение из списка'})
-											.add($('<svg>',{class: 'quiz__select-btn-svg',})),
-									})
-									.add(list)
-									.add($('<input>',{
-										class: 'quiz__hidden-input',
+								block.appendTo('.quiz__body');
+								if (obj.textAnswer !== undefined) {
+									$('.quiz__body').append($('<input>',{
+										class: 'quiz__additional-field',
 										type: 'text',
-									})),
-								});
-							}
-							block.appendTo('.quiz__body');
-							if (obj.textAnswer !== undefined) {
-								$('.quiz__body').append($('<input>',{
-									class: 'quiz__additional-field',
-									type: 'text',
-									placeholder: 'Вы можете дополнить свой ответ',
-									val: obj.textAnswer,
-								}));
-							}
-							initQuizSelects();
-							break;
-						case 'pic':
-							var pictures = $('<div>',{class: 'quiz__pictures swiper-wrapper'});
-							if (obj.answer !== undefined) {
-								for (var key in obj.poll) {
-									for (var answerKey in obj.answer) {
-										if (answerKey === key) {
-											pictures.append($('<label>',{
-												class: 'quiz__pic swiper-slide',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'radio',
-													checked: 'checked',
-													val: key,
-													name: 'pictures-group'
-												})
-												.add($('<div>',{
-													class: 'quiz__pic-img-wrapper',
-													append: $('<img>',{
-														class: 'quiz__pic-img',
-														src: obj.pic[key],
-														alt: obj.poll[key],
-													}),
-												}))
-												.add($('<div>',{
-													class:'quiz__pic-label',
-													text: obj.poll[key],
-												})),
-											}));
-										} else {
-											pictures.append($('<label>',{
-												class: 'quiz__pic swiper-slide',
-												append: $('<input>',{
-													class: 'quiz__hidden-input',
-													type: 'radio',
-													val: key,
-													name: 'pictures-group'
-												})
-												.add($('<div>',{
-													class: 'quiz__pic-img-wrapper',
-													append: $('<img>',{
-														class: 'quiz__pic-img',
-														src: obj.pic[key],
-														alt: obj.poll[key],
-													}),
-												}))
-												.add($('<div>',{
-													class:'quiz__pic-label',
-													text: obj.poll[key],
-												})),
-											}));
-										}
-									} 
-								}
-							} else {
-								for (var key in obj.poll) {
-									pictures.append($('<label>',{
-										class: 'quiz__pic swiper-slide',
-										append: $('<input>',{
-											class: 'quiz__hidden-input',
-											type: 'radio',
-											val: key,
-											name: 'pictures-group'
-										})
-										.add($('<div>',{
-											class: 'quiz__pic-img-wrapper',
-											append: $('<img>',{
-												class: 'quiz__pic-img',
-												src: obj.pic[key],
-												alt: obj.poll[key],
-											}),
-										}))
-										.add($('<div>',{
-											class:'quiz__pic-label',
-											text: obj.poll[key],
-										})),
+										placeholder: 'Вы можете дополнить свой ответ',
+										val: obj.textAnswer,
 									}));
 								}
-							}
-							var block = $('<div>',{
-								class: 'swiper-container',
-								append: pictures.add($('<div>',{
-									class:'swiper-button-prev',
-									append: $('<svg>',{class: 'swiper-button-svg'}),
-								}))
-								.add($('<div>',{
-									class:'swiper-button-next',
-									append: $('<svg>',{class: 'swiper-button-svg'}),
-								}))
-								.add($('<div>',{class:'swiper-scrollbar'})),
-							});
-							block.appendTo('.quiz__body');
-							if (obj.textAnswer !== undefined) {
-								$('.quiz__body').append($('<input>',{
-									class: 'quiz__additional-field',
-									type: 'text',
-									placeholder: 'Вы можете дополнить свой ответ',
-									val: obj.textAnswer,
-								}));
-							}
-							initQuizCheckboxes('pictures');
-							initSwiper();
-							break;
-						case 'text':
-							var block;
-							if (obj.answer!==undefined) {
-								block = $('<textarea>',{
-									class: 'quiz__textarea',
-									placeholder: 'Введите текст',
-									val: obj.answer,
-								});
-							} else {
-								block = $('<textarea>',{
-									class: 'quiz__textarea',
-									placeholder: 'Введите текст'
-								});
-							}
-							block.appendTo($('.quiz__body'));
-							break;
-						case 'num':
-							var block;
-							if (obj.answer!==undefined) {
-								block = $('<input>',{
-									class: 'quiz__number',
-									type: 'number',
-									pattern:'[0-9]*',
-									placeholder: 'Число',
-									val: obj.answer,
-								});
-							} else {
-								block = $('<input>',{
-									class: 'quiz__number',
-									type: 'number',
-									pattern:'[0-9]*',
-									placeholder: 'Число',
-								});
-							}
-							block.appendTo($('.quiz__body'));
-							break;
-						case 'message':
-							var block = $('<div>',{
-								class: 'quiz__output',
-								text: obj.message,
-							});
-							block.appendTo($('.quiz__body'));
-							break;
-					}
-
-					processLabelValue.empty().append(progressPercent+'%');
-					processFieldStyle.css({width:progressPercent+'%'});
-
-					buttons.empty();
-					if (obj !== data.poll[data.order[0]] && obj.back === '1') {
-						buttons.append(prevBtn);
-					}
-					if (obj.skip === '1') {
-						buttons.append(skipBtn);
-					}
-					if (obj !== data.poll[data.order[data.order.length-1]]) {
-						buttons.append(nextBtn);
-					}
-					initButtons();
-
-					if (obj.text !== undefined && obj.text.length>0) {
-						switch(obj.type) {
-							case 'checkbox':
-							case 'radio':
+								initQuizSelects();
+								break;
 							case 'pic':
-								var inputs = $('.quiz__hidden-input');
-								inputs.each(function(i,el){
-									$(el).off('change.text').on('change.text',function(){
-										var count = 0;
-										$('.quiz__hidden-input:checked').each(function(iter,elem){
-											for (var j=0;j<obj.text.length;j++) {
-												if($(elem).val()===obj.text[j]) count++;
+								var pictures = $('<div>',{class: 'quiz__pictures swiper-wrapper'});
+								if (obj.answer !== undefined) {
+									for (var key in obj.poll) {
+										for (var answerKey in obj.answer) {
+											if (answerKey === key) {
+												pictures.append($('<label>',{
+													class: 'quiz__pic swiper-slide',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'radio',
+														checked: 'checked',
+														val: key,
+														name: 'pictures-group'
+													})
+													.add($('<div>',{
+														class: 'quiz__pic-img-wrapper',
+														append: $('<img>',{
+															class: 'quiz__pic-img',
+															src: obj.pic[key],
+															alt: obj.poll[key],
+														}),
+													}))
+													.add($('<div>',{
+														class:'quiz__pic-label',
+														text: obj.poll[key],
+													})),
+												}));
+											} else {
+												pictures.append($('<label>',{
+													class: 'quiz__pic swiper-slide',
+													append: $('<input>',{
+														class: 'quiz__hidden-input',
+														type: 'radio',
+														val: key,
+														name: 'pictures-group'
+													})
+													.add($('<div>',{
+														class: 'quiz__pic-img-wrapper',
+														append: $('<img>',{
+															class: 'quiz__pic-img',
+															src: obj.pic[key],
+															alt: obj.poll[key],
+														}),
+													}))
+													.add($('<div>',{
+														class:'quiz__pic-label',
+														text: obj.poll[key],
+													})),
+												}));
+											}
+										} 
+									}
+								} else {
+									for (var key in obj.poll) {
+										pictures.append($('<label>',{
+											class: 'quiz__pic swiper-slide',
+											append: $('<input>',{
+												class: 'quiz__hidden-input',
+												type: 'radio',
+												val: key,
+												name: 'pictures-group'
+											})
+											.add($('<div>',{
+												class: 'quiz__pic-img-wrapper',
+												append: $('<img>',{
+													class: 'quiz__pic-img',
+													src: obj.pic[key],
+													alt: obj.poll[key],
+												}),
+											}))
+											.add($('<div>',{
+												class:'quiz__pic-label',
+												text: obj.poll[key],
+											})),
+										}));
+									}
+								}
+								var block = $('<div>',{
+									class: 'swiper-container',
+									append: pictures.add($('<div>',{
+										class:'swiper-button-prev',
+										append: $('<svg>',{class: 'swiper-button-svg'}),
+									}))
+									.add($('<div>',{
+										class:'swiper-button-next',
+										append: $('<svg>',{class: 'swiper-button-svg'}),
+									}))
+									.add($('<div>',{class:'swiper-scrollbar'})),
+								});
+								block.appendTo('.quiz__body');
+								if (obj.textAnswer !== undefined) {
+									$('.quiz__body').append($('<input>',{
+										class: 'quiz__additional-field',
+										type: 'text',
+										placeholder: 'Вы можете дополнить свой ответ',
+										val: obj.textAnswer,
+									}));
+								}
+								initQuizCheckboxes('pictures');
+								initSwiper();
+								break;
+							case 'text':
+								var block;
+								if (obj.answer!==undefined) {
+									block = $('<textarea>',{
+										class: 'quiz__textarea',
+										placeholder: 'Введите текст',
+										val: obj.answer,
+									});
+								} else {
+									block = $('<textarea>',{
+										class: 'quiz__textarea',
+										placeholder: 'Введите текст'
+									});
+								}
+								block.appendTo($('.quiz__body'));
+								break;
+							case 'num':
+								var block;
+								if (obj.answer!==undefined) {
+									block = $('<input>',{
+										class: 'quiz__number',
+										type: 'number',
+										pattern:'[0-9]*',
+										placeholder: 'Число',
+										val: obj.answer,
+									});
+								} else {
+									block = $('<input>',{
+										class: 'quiz__number',
+										type: 'number',
+										pattern:'[0-9]*',
+										placeholder: 'Число',
+									});
+								}
+								block.appendTo($('.quiz__body'));
+								break;
+							case 'message':
+								var block = $('<div>',{
+									class: 'quiz__output',
+									text: obj.message,
+								});
+								block.appendTo($('.quiz__body'));
+								break;
+						}
+						processLabelValue.empty().append(progressPercent+'%');
+						processFieldStyle.css({width:progressPercent+'%'});
+						buttons.empty();
+						if (obj !== data.poll[data.order[0]] && obj.back === '1') {
+							buttons.append(prevBtn);
+						}
+						if (obj.skip === '1') {
+							buttons.append(skipBtn);
+						}
+						if (obj !== data.poll[data.order[data.order.length-1]]) {
+							buttons.append(nextBtn);
+						}
+						initButtons();
+						if (obj.text !== undefined && obj.text.length>0) {
+							switch(obj.type) {
+								case 'checkbox':
+								case 'radio':
+								case 'pic':
+									var inputs = $('.quiz__hidden-input');
+									inputs.each(function(i,el){
+										$(el).off('change.text').on('change.text',function(){
+											var count = 0;
+											$('.quiz__hidden-input:checked').each(function(iter,elem){
+												for (var j=0;j<obj.text.length;j++) {
+													if($(elem).val()===obj.text[j]) count++;
+												}
+											});
+											if (count>0&&$('.quiz__additional-field').length===0) {
+												$('.quiz__body').append($('<input>',{
+													class: 'quiz__additional-field',
+													type: 'text',
+													placeholder: 'Вы можете дополнить свой ответ',
+												}));
+											} else if (count===0&&$('.quiz__additional-field').length>0) {
+												$('.quiz__additional-field').remove();
 											}
 										});
-										if (count>0&&$('.quiz__additional-field').length===0) {
+									});
+									break;
+								case 'select':
+									var input = $('.quiz__hidden-input');
+									input.off('change.text').on('change.text', function(){
+										var flag = false;
+										for (var i=0;i<obj.text.length;i++) {
+											if(input.val()===obj.text[i]) flag = true;
+										}
+										if (flag&&$('.quiz__additional-field').length===0) {
 											$('.quiz__body').append($('<input>',{
 												class: 'quiz__additional-field',
 												type: 'text',
 												placeholder: 'Вы можете дополнить свой ответ',
 											}));
-										} else if (count===0&&$('.quiz__additional-field').length>0) {
+										} else if (!flag&&$('.quiz__additional-field').length>0) {
 											$('.quiz__additional-field').remove();
 										}
 									});
-								});
-								break;
-							case 'select':
-								var input = $('.quiz__hidden-input');
-								input.off('change.text').on('change.text', function(){
-									var flag = false;
-									for (var i=0;i<obj.text.length;i++) {
-										if(input.val()===obj.text[i]) flag = true;
-									}
-									if (flag&&$('.quiz__additional-field').length===0) {
-										$('.quiz__body').append($('<input>',{
-											class: 'quiz__additional-field',
-											type: 'text',
-											placeholder: 'Вы можете дополнить свой ответ',
-										}));
-									} else if (!flag&&$('.quiz__additional-field').length>0) {
-										$('.quiz__additional-field').remove();
-									}
-								});
-								break;
+									break;
+							}
 						}
-					}
+						$('.quiz__body').css({
+							transform: 'translateX('+(100*factor)+'px)',
+							transition: 'all 0s'
+						});
+						setTimeout(function(){
+							$('.quiz__body').css({
+								transform: 'translateX(0px)',
+								opacity: 1,
+								transition: 'all 0.2s ease'
+							});
+						},10);
+					},200);
+				},
+				sendAnswer = function() {
+					var answer = {};
+					console.log(answer);
 				},
 				renderPreviousChunk = function() {
 					if (data.currentChunk >= 1) {
 						data.currentChunk--;
-						renderQuestion(data.poll[data.order[data.currentChunk]]);
+						renderQuestion(data.poll[data.order[data.currentChunk]],'right');
 					}
 				}
 				skipChunk = function() {
 					if (data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
 						data.currentChunk++;
-						renderQuestion(data.poll[data.order[data.currentChunk]]);
+						renderQuestion(data.poll[data.order[data.currentChunk]],'left');
+						if (data.currentChunk===data.order.length-1) {
+							sendAnswer();
+						}
 					}
 				}
 				renderNextChunk = function() {
@@ -600,9 +626,39 @@ $(document).ready(function(){
 						addAnswers(data.poll[data.order[data.currentChunk]]);
 						changeOrder(data.poll[data.order[data.currentChunk]]);
 						data.currentChunk++;
-						renderQuestion(data.poll[data.order[data.currentChunk]]);
+						renderQuestion(data.poll[data.order[data.currentChunk]],'left');
+						if (data.currentChunk===data.order.length-1) {
+							sendAnswer();
+						}
 					} else {
-						alert('Условия для продолжения не соблюдены');
+						if ($('.popup-wrapper').length===0) {
+							var closePopup = function () {
+								$('.popup-wrapper').css({
+									opacity: 0,
+								});
+								$('.popup').css({transform: 'translateY(100px)'});
+								setTimeout(function(){
+									$('.popup-wrapper').remove();
+								},200);
+							};
+							$('body').append($('<div>', {
+								class: 'popup-wrapper',
+								append: $('<div>',{
+									class: 'popup',
+									text: 'Условия для продолжения не соблюдены',
+									append: $('<button>',{class: 'popup__close-btn'})
+								}),
+							}));
+							setTimeout(function(){
+								$('.popup-wrapper').css({opacity: 1});
+								$('.popup').css({transform: 'translateY(0)'});
+							},10);
+							$('.popup').off('click.my').on('click.my',function(evt){
+								evt.stopPropagation();
+							});
+							$('.popup__close-btn').off('click.my').on('click.my',closePopup);
+							$('.popup-wrapper').off('click.my').on('click.my', closePopup);
+						}
 					}
 				};
 			data.currentChunk = 0;
@@ -629,10 +685,8 @@ $(document).ready(function(){
 			// Конец работы с JSON
 			// 
 		}).fail(function(){
-			console.log('JSON не загрузился');
+			alert('JSON не загрузился');
 		});
-		// JSONdata.pollSize = objSize;
-		// console.log(JSONdata.pollSize);
 	}
 	function initQuizSelects() {
 		var selects = $('.quiz__select'),
