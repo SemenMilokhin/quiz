@@ -51,7 +51,7 @@ $(document).ready(function(){
 								});
 							}
 							var textAnswer = $('.quiz__additional-field');
-							if (textAnswer.length>0&&textAnswer.val()!=='') {
+							if (textAnswer.length>0) {
 								obj.textAnswer = textAnswer.val();
 							}
 							break;
@@ -61,7 +61,7 @@ $(document).ready(function(){
 							obj.answer[answerValue] = obj.poll[answerValue];
 
 							var textAnswer = $('.quiz__additional-field');
-							if (textAnswer.length>0&&textAnswer.val()!=='') {
+							if (textAnswer.length>0) {
 								obj.textAnswer = textAnswer.val();
 							}
 							break;
@@ -75,18 +75,67 @@ $(document).ready(function(){
 							break;
 					}
 				},
-				checkNextSubChunk = function(obj) {
-					var result = '';
-					if (obj.type==='radio'||obj.type==='select'||obj.type==='pic') {
-						for (var answerKey in obj.answer) {
-							for (var i=0;i<data.subQuestions.length;i++) {
-								if (answerKey.substr(2)===data.subQuestions[i].substr(1)) {
-									result = data.subQuestions[i];
+				changeOrder = function(obj) {
+					switch(obj.type) {
+						case 'radio':
+						case 'pic':
+						case 'select':
+							for (var answerKey in obj.answer) {
+								for (var i=0;i<data.subQuestions.length;i++) {
+									if (answerKey.substr(2)===data.subQuestions[i].substr(1)) { //если нужно добавить подвопрос в очередь
+										var flag = true;
+										for (var j = 0;j<data.order.length;j++) {
+											if (data.order[j]===data.subQuestions[i]) {
+												flag = false;
+											}
+										}
+										for (var k = 0;k<data.subQuestions.length;k++) {
+											if (data.order[data.currentChunk+1]===data.subQuestions[k]&&data.order[data.currentChunk+1]!==data.subQuestions[i]) {
+												data.order.splice(data.currentChunk+1, 1)
+											}
+										}
+										if (flag) {
+											data.order.splice(data.currentChunk+1, 0, data.subQuestions[i]);
+										}
+									}
 								}
 							}
-						}
+							break;
+						case 'num':
+							if (obj.rule!==undefined) {
+								for (var j = 0;j<data.slices.length;j++) {
+									if (data.slices[j].start === data.order[data.currentChunk] && data.slices[j].end === data.order[data.currentChunk+1]) {
+										for (var k = 0; k<data.slices[j].part.length; k++) {
+											data.order.splice(data.currentChunk+1+k, 0, data.slices[j].part[k]);
+										}
+										data.slices.splice(j, 1);
+									}
+								}
+								for (var questionKey in obj.rule) {
+									if (obj.answer<Number(questionKey)) {
+										var position = 0;
+										for (var i = 0;i<data.order.length;i++) {
+											if (obj.rule[questionKey]===data.order[i]) {
+												position = i;
+											}
+										}
+										if (data.currentChunk+1 < position) {
+											var slice = {};
+											slice.part = [];
+											slice.start = data.order[data.currentChunk];
+											slice.end = data.order[position];
+											for (var j = data.currentChunk+1; j<position; j++) {
+												slice.part.push(data.order[j]);
+											}
+											data.order.splice(data.currentChunk+1, position-data.currentChunk-1);
+											data.slices.push(slice);
+										}
+										break;
+									}
+								}
+							}
+							break;
 					}
-					return result;
 				},
 				renderQuestion = function(obj) {
 					var title = $('.quiz__title'),
@@ -476,13 +525,13 @@ $(document).ready(function(){
 					processFieldStyle.css({width:progressPercent+'%'});
 
 					buttons.empty();
-					if (obj !== data.poll[order[0]] && obj.back === '1') {
+					if (obj !== data.poll[data.order[0]] && obj.back === '1') {
 						buttons.append(prevBtn);
 					}
 					if (obj.skip === '1') {
 						buttons.append(skipBtn);
 					}
-					if (obj !== data.poll[order[data.order.length-1]]) {
+					if (obj !== data.poll[data.order[data.order.length-1]]) {
 						buttons.append(nextBtn);
 					}
 					initButtons();
@@ -535,66 +584,43 @@ $(document).ready(function(){
 					}
 				},
 				renderPreviousChunk = function() {
-					if (data.isSubChunk) {
-						renderQuestion(data.poll[order[data.currentChunk]]);
-						data.isSubChunk = false;
-						data.currentSubChunk = '';
-					} else if (data.currentChunk >= 1 && data.currentChunk < data.order.length) {
-						data.currentChunk-=1;
-						renderQuestion(data.poll[order[data.currentChunk]]);
+					if (data.currentChunk >= 1) {
+						data.currentChunk--;
+						renderQuestion(data.poll[data.order[data.currentChunk]]);
 					}
 				}
 				skipChunk = function() {
 					if (data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
-						data.currentChunk+=1;
-						renderQuestion(data.poll[order[data.currentChunk]]);
+						data.currentChunk++;
+						renderQuestion(data.poll[data.order[data.currentChunk]]);
 					}
 				}
 				renderNextChunk = function() {
-					if (data.isSubChunk) {
-						if (checkConditions(data.poll[data.currentSubChunk]) && data.currentChunk < data.order.length-1) {
-							addAnswers(data.poll[data.currentSubChunk]);
-							data.currentChunk+=1;
-							renderQuestion(data.poll[order[data.currentChunk]]);
-							data.isSubChunk = false;
-							data.currentSubChunk = '';
-						}
-					} else if (checkConditions(data.poll[order[data.currentChunk]]) && data.currentChunk < data.order.length-1) {
-						addAnswers(data.poll[order[data.currentChunk]]);
-						var nextSubChunk = checkNextSubChunk(data.poll[order[data.currentChunk]]);
-						if (nextSubChunk!=='') {
-							renderQuestion(data.poll[nextSubChunk]);
-							data.isSubChunk = true;
-							data.currentSubChunk = nextSubChunk;
-						} else {
-							data.currentChunk+=1;
-							renderQuestion(data.poll[order[data.currentChunk]]);
-						}	
+					if (checkConditions(data.poll[data.order[data.currentChunk]]) && data.currentChunk < data.order.length-1) {
+						addAnswers(data.poll[data.order[data.currentChunk]]);
+						changeOrder(data.poll[data.order[data.currentChunk]]);
+						data.currentChunk++;
+						renderQuestion(data.poll[data.order[data.currentChunk]]);
 					} else {
 						alert('Условия для продолжения не соблюдены');
 					}
 				};
 			data.currentChunk = 0;
-			data.currentSubChunk = '';
-			data.isSubChunk = false;
-
-			var order = [];
-			var subQuestions = [];
+			data.slices = [];
+			data.order = [];
+			data.subQuestions = [];
 			for (var key in data.poll) {
 				if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='p') {
-					order.push(key);
+					data.order.push(key);
 				} else if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='r') {
-					subQuestions.push(key);
+					data.subQuestions.push(key);
 				}
 			}
-			order.sort(function(a,b){
+			data.order.sort(function(a,b){
 				return(Number(a.substr(1)) - Number(b.substr(1)));
 			});
-			data.order = order;
-			data.subQuestions = subQuestions;
 
-
-			renderQuestion(data.poll[order[data.currentChunk]]);
+			renderQuestion(data.poll[data.order[data.currentChunk]]);
 			initButtons();
 			
 
