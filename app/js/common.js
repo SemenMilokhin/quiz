@@ -83,7 +83,6 @@ $(document).ready(function(){
 							for (var answerKey in obj.answer) {
 								for (var i=data.currentChunk+1;i<data.order.length;i++) {
 									if (data.order[i].substr(0,1)==='r') {
-										console.log(data.order[i]);
 										data.order.splice(i, 1);
 										i--;
 									}
@@ -144,6 +143,9 @@ $(document).ready(function(){
 					if (direction==='right') {
 						factor = -1;
 					}
+					$('.quiz__btn').each(function(i,el){
+						$(el).prop('disabled',true);
+					});
 					$('.quiz__body').css({
 						opacity: 0,
 						transform: 'translateX('+(-100*factor)+'px)',
@@ -599,12 +601,47 @@ $(document).ready(function(){
 								opacity: 1,
 								transition: 'all 0.2s ease'
 							});
-						},10);
+						},100);
 					},200);
 				},
 				sendAnswer = function() {
 					var answer = {};
+					answer.id_client = data.id_client;
+					answer.id_poll = data.id_poll;
+					answer.start = data.start;
+					answer.end = Date.now();
+					answer.answers = {};
+					for (var i=0;i<data.order.length;i++) {
+						var q = {},
+							flag = false;
+						if (data.poll[data.order[i]].answer!==undefined) {
+							if (data.poll[data.order[i]].answer.length===undefined) {
+								q.id = [];
+								for (var answerKey in data.poll[data.order[i]].answer) {
+									q.id.push(answerKey);
+								}
+							} else if (data.poll[data.order[i]].answer.length>0&&typeof(data.poll[data.order[i]].answer)==='object') {
+								q.id = [];
+								for (var j=0;j<data.poll[data.order[i]].answer.length;j++) {
+									for (var answerKey in data.poll[data.order[i]].answer[j]) {
+										q.id.push(answerKey);
+									}
+								}
+							} else if (typeof(data.poll[data.order[i]].answer)==='string') {
+								q.text = data.poll[data.order[i]].answer;
+							}
+							flag = true;
+						}
+						if (data.poll[data.order[i]].textAnswer!==undefined) {
+							q.text = data.poll[data.order[i]].textAnswer;
+							flag = true;
+						}
+						if (flag) {
+							answer.answers[data.order[i]] = q;
+						}
+					}
 					console.log(answer);
+					console.log(JSON.stringify(answer));
 				},
 				renderPreviousChunk = function() {
 					if (data.currentChunk >= 1) {
@@ -645,14 +682,16 @@ $(document).ready(function(){
 								class: 'popup-wrapper',
 								append: $('<div>',{
 									class: 'popup',
-									text: 'Условия для продолжения не соблюдены',
-									append: $('<button>',{class: 'popup__close-btn'})
+									append: $('<button>',{class: 'popup__close-btn'}).add($('<div>',{
+										class: 'popup__text',
+										text: 'Чтобы продолжить нужно выбрать/ввести значение или пропустить шаг.',
+									}))
 								}),
 							}));
 							setTimeout(function(){
 								$('.popup-wrapper').css({opacity: 1});
 								$('.popup').css({transform: 'translateY(0)'});
-							},10);
+							},100);
 							$('.popup').off('click.my').on('click.my',function(evt){
 								evt.stopPropagation();
 							});

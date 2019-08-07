@@ -519,13 +519,14 @@ body, button, input, textarea {
 		cursor: pointer;
 		padding: 0 22px 1px;
 		border: 1px solid #e5e5e5;
-		margin: 0 18px 0 0;
+		margin: 0 18px 0 auto;
 		transition: all .2s ease-out;
 		&:hover {
 			border-color: $text-color;
 		}
 		&_prev {
 			padding-left: 16px;
+			margin-left: 0;
 		}
 		&_next {
 			padding-right: 16px;
@@ -557,10 +558,6 @@ body, button, input, textarea {
 				animation-iteration-count: infinite;
 			}
 		}
-		&[disabled] {
-			opacity: .7;
-			cursor: not-allowed;
-		}
 	}
 	&__btn-svg {
 		width: 20px;
@@ -591,7 +588,6 @@ body, button, input, textarea {
 .popup {
 	position: absolute;
 	background-color: #fff;
-	color: $text-color;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -599,13 +595,20 @@ body, button, input, textarea {
 	margin: auto;
 	width: 550px;
 	height: 300px;
-	font-size: 18px;
-	font-weight: 500;
-	line-height: 1.2;
 	transition: all .2s ease;
 	transform: translateY(-100px);
 	border-radius: 10px;
-	padding: 15px;
+	padding: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	&__text {
+		font-size: 18px;
+		font-weight: 500;
+		line-height: 1.2;
+		color: $text-color;
+		text-align: center;
+	}
 	&__close-btn {
 		position: absolute;
 		width: 36px;
