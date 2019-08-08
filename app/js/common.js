@@ -609,7 +609,7 @@ $(document).ready(function(){
 					answer.id_client = data.id_client;
 					answer.id_poll = data.id_poll;
 					answer.start = data.start;
-					answer.end = Date.now();
+					answer.end = Math.round(new Date() / 1000);
 					answer.answers = {};
 					for (var i=0;i<data.order.length;i++) {
 						var q = {},
