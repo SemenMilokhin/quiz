@@ -2,7 +2,7 @@ $(document).ready(function(){
 	loadJSON();
 
 	function loadJSON() {
-		$.getJSON('../json/config.json', function(data){
+		$.getJSON('json/config.json', function(data){
 			var initButtons = function() {
 					var buttons = $('.quiz__buttons'),
 						prevBtn = buttons.find('.quiz__btn_prev'),
