@@ -19,6 +19,7 @@ $(document).ready(function(){
 						case 'radio':
 						case 'checkbox':
 						case 'pic':
+						case 'sortable':
 							if ($('.quiz__hidden-input:checked').length === 0) result = false;
 							break;
 						case 'select':
@@ -72,6 +73,21 @@ $(document).ready(function(){
 						case 'text':
 							var answerValue = $('.quiz__textarea').val();
 							obj.answer = answerValue;
+							break;
+						case 'sortable':
+							obj.answer = {};
+							var answerFields = $('.quiz__hidden-input:checked');
+							answerFields.each(function(i,el){
+								obj.answer[$(el).val()] = $(el).parent('label').find('.quiz__order-item-number').text();
+							});
+							console.log(obj.answer);
+							break;
+						case 'slider':
+							var inputs = $('.quiz__slider-field');
+							obj.answer = {};
+							inputs.each(function(i,el){
+								obj.answer[$(el).parent('div').parent('.quiz__slider').attr('data-id')] = $(el).val();
+							});
 							break;
 					}
 				},
@@ -272,15 +288,15 @@ $(document).ready(function(){
 										}
 									} else if (obj.answer.length>0) {
 										for (var key in obj.poll) {
-											var isCheked = false
+											var isChecked = false
 											for (var i = 0; i < obj.answer.length; i++) {
 												for (var answerKey in obj.answer[i]) {
 													if (answerKey === key) {
-														isCheked = true;
+														isChecked = true;
 													}
 												}
 											}
-											if (isCheked) {
+											if (isChecked) {
 												block.append($('<label>',{
 													class: 'quiz__checkbox',
 													append: $('<input>',{
@@ -530,6 +546,140 @@ $(document).ready(function(){
 									text: obj.message,
 								});
 								block.appendTo($('.quiz__body'));
+								break;
+							case 'sortable':
+								var block = $('<div>',{class: 'quiz__order'});
+								if (obj.answer !== undefined) {
+									for (var key in obj.poll) {
+										var isChecked = false;
+										for (var answerKey in obj.answer) {
+											if (key === answerKey) {
+												isChecked = true;
+											}
+										}
+										if (isChecked) {
+											block.append($('<label>',{
+												class: 'quiz__order-item',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'checkbox',
+													checked: 'checked',
+													name: 'sortable-group',
+													val: key
+												})
+												.add($('<span>',{
+													class: 'quiz__order-item-number-part',
+													append: $('<span>',{
+														class: 'quiz__order-item-number',
+														text: obj.answer[key]
+													})
+												}))
+												.add($('<span>',{
+													class: 'quiz__order-item-text-part',
+													text: obj.poll[key]
+												}))
+											}));
+										} else {
+											block.append($('<label>',{
+												class: 'quiz__order-item',
+												append: $('<input>',{
+													class: 'quiz__hidden-input',
+													type: 'checkbox',
+													name: 'sortable-group',
+													val: key
+												})
+												.add($('<span>',{
+													class: 'quiz__order-item-number-part',
+													append: $('<span>',{
+														class: 'quiz__order-item-number',
+														text: '?'
+													})
+												}))
+												.add($('<span>',{
+													class: 'quiz__order-item-text-part',
+													text: obj.poll[key]
+												}))
+											}));
+										}
+									}
+								} else {
+									for (var key in obj.poll) {
+										block.append($('<label>',{
+											class: 'quiz__order-item',
+											append: $('<input>',{
+												class: 'quiz__hidden-input',
+												type: 'checkbox',
+												name: 'sortable-group',
+												val: key
+											})
+											.add($('<span>',{
+												class: 'quiz__order-item-number-part',
+												append: $('<span>',{
+													class: 'quiz__order-item-number',
+													text: '?'
+												})
+											}))
+											.add($('<span>',{
+												class: 'quiz__order-item-text-part',
+												text: obj.poll[key]
+											}))
+										}));
+									}
+								}
+								
+								block.appendTo($('.quiz__body'));
+								initOrder();
+								break;
+							case 'slider':
+								var block = $('<ul>',{class: 'quiz__sliders-list'});
+								if (obj.answer !== undefined) {
+									for (var key in obj.poll) {
+										block.append($('<li>',{
+											class:'quiz__slider',
+											'data-id': key,
+											append: $('<h2>',{
+												class: 'quiz__slider-title',
+												text: obj.poll[key]
+											})
+											.add($('<div>',{
+												class: 'quiz__slider-field-wrapper',
+												append: $('<input>',{
+													class: 'quiz__slider-field',
+													type: 'range',
+													min: '0',
+													max: '10',
+													val: obj.answer[key]
+												})
+												.add($('<div>',{class:'quiz__slider-value'}))
+											}))
+										}));
+									}
+								} else {
+									for (var key in obj.poll) {
+										block.append($('<li>',{
+											class:'quiz__slider',
+											'data-id': key,
+											append: $('<h2>',{
+												class: 'quiz__slider-title',
+												text: obj.poll[key]
+											})
+											.add($('<div>',{
+												class: 'quiz__slider-field-wrapper',
+												append: $('<input>',{
+													class: 'quiz__slider-field',
+													type: 'range',
+													min: '0',
+													max: '10',
+													val: '0'
+												})
+												.add($('<div>',{class:'quiz__slider-value'}))
+											}))
+										}));
+									}
+								}
+								
+								block.appendTo($('.quiz__body'));
+								initSliders();
 								break;
 						}
 						processLabelValue.empty().append(progressPercent+'%');
@@ -840,5 +990,58 @@ $(document).ready(function(){
 				},
 			})
 		}
+	}
+
+	function initOrder() {
+		var orderItems = $('.quiz__order-item'),
+			currentNumber = 1;
+		orderItems.each(function(i,el){
+			if ($(el).find('.quiz__hidden-input').prop('checked')) {
+				currentNumber++;
+			}
+		});
+		orderItems.each(function(i,el){
+			var input = $(el).find('.quiz__hidden-input'),
+				number = $(el).find('.quiz__order-item-number');
+			if (input.prop('checked')) {
+				$(el).addClass('quiz__order-item_checked');
+			}
+			input.off('change.my').on('change.my', function(){
+				if (input.prop('checked')) {
+					$(el).addClass('quiz__order-item_checked');
+					number.text(currentNumber);
+					currentNumber++;
+				} else {
+					$(el).removeClass('quiz__order-item_checked');
+					var clickedNumber = Number(number.text()); 
+					number.text('?');
+					orderItems.each(function(iter,elem){
+						var currentItemInput = $(elem).find('.quiz__hidden-input');
+						if (currentItemInput.prop('checked')) {
+							var currentItemNumber = $(elem).find('.quiz__order-item-number'),
+								currentItemNumberValue = Number(currentItemNumber.text());
+							if (currentItemNumberValue > clickedNumber) {
+								currentItemNumber.text(currentItemNumberValue-1);
+							}
+						}
+					});
+					currentNumber--;
+				}
+			});
+		});
+	}
+	function initSliders() {
+		var sliders = $('.quiz__slider');
+		sliders.each(function(i,el){
+			var input = $(el).find('.quiz__slider-field'),
+				output = $(el).find('.quiz__slider-value');
+			output.text(input.val());
+			input.off('input.my').on('input.my',function(){
+				output.text(input.val());
+			});
+			input.off('change.my').on('change.my',function(){
+				output.text(input.val());
+			});
+		});
 	}
 });
