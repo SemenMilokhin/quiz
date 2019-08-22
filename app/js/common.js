@@ -35,6 +35,9 @@ $(document).ready(function(){
 					return result;
 				},
 				addAnswers = function(obj) {
+					if (obj.textAnswer !== undefined) {
+						delete obj.textAnswer;
+					}
 					switch (obj.type) {
 						case 'radio':
 						case 'checkbox':
@@ -80,7 +83,6 @@ $(document).ready(function(){
 							answerFields.each(function(i,el){
 								obj.answer[$(el).val()] = $(el).parent('label').find('.quiz__order-item-number').text();
 							});
-							console.log(obj.answer);
 							break;
 						case 'slider':
 							var inputs = $('.quiz__slider-field');
@@ -670,7 +672,7 @@ $(document).ready(function(){
 													type: 'range',
 													min: '0',
 													max: '10',
-													val: '0'
+													val: '5'
 												})
 												.add($('<div>',{class:'quiz__slider-value'}))
 											}))
@@ -764,21 +766,63 @@ $(document).ready(function(){
 					for (var i=0;i<data.order.length;i++) {
 						var q = {},
 							flag = false;
+
 						if (data.poll[data.order[i]].answer!==undefined) {
-							if (data.poll[data.order[i]].answer.length===undefined) {
-								q.id = [];
-								for (var answerKey in data.poll[data.order[i]].answer) {
-									q.id.push(answerKey);
-								}
-							} else if (data.poll[data.order[i]].answer.length>0&&typeof(data.poll[data.order[i]].answer)==='object') {
-								q.id = [];
-								for (var j=0;j<data.poll[data.order[i]].answer.length;j++) {
-									for (var answerKey in data.poll[data.order[i]].answer[j]) {
-										q.id.push(answerKey);
+							switch (data.poll[data.order[i]].type) {
+								case 'radio':
+								case 'checkbox':
+								case 'pic':
+									if (data.poll[data.order[i]].answer.length===undefined) {
+										for (var answerKey in data.poll[data.order[i]].answer) {
+											q.id = answerKey;
+										}
+									} else if (data.poll[data.order[i]].answer.length>0) {
+										q.id = [];
+										for (var j=0;j<data.poll[data.order[i]].answer.length;j++) {
+											for (var answerKey in data.poll[data.order[i]].answer[j]) {
+												q.id.push(answerKey);
+											}
+										}
 									}
-								}
-							} else if (typeof(data.poll[data.order[i]].answer)==='string') {
-								q.text = data.poll[data.order[i]].answer;
+									break;
+								case 'select':
+									for (var answerKey in data.poll[data.order[i]].answer) {
+										q.id = answerKey;
+									}
+									break;
+								case 'text':
+								case 'num':
+									q.text = data.poll[data.order[i]].answer;
+									break;
+								case 'sortable':
+									var newArray = [];
+									q.order = [];
+									for (var key in data.poll[data.order[i]].answer) {
+										if(data.poll[data.order[i]].answer.hasOwnProperty(key)) {
+											var answerObject = {};
+											answerObject[data.poll[data.order[i]].answer[key]] = key;
+											newArray.push(answerObject);
+										}
+									}
+									newArray.sort(function(a,b){
+										for (var keyA in a) {
+											for (var keyB in b) {
+												return keyA - keyB;
+											}
+										}
+									});
+									for (var j=0;j<newArray.length;j++) {
+										for (var key in newArray[j]) {
+											q.order.push(newArray[j][key]);
+										}
+									}
+									break;
+								case 'slider':
+									q.evaluation = {}
+									for (var answerKey in data.poll[data.order[i]].answer) {
+										q.evaluation[answerKey] = data.poll[data.order[i]].answer[answerKey];
+									}
+									break;
 							}
 							flag = true;
 						}
@@ -786,6 +830,7 @@ $(document).ready(function(){
 							q.text = data.poll[data.order[i]].textAnswer;
 							flag = true;
 						}
+
 						if (flag) {
 							answer.answers[data.order[i]] = q;
 						}
