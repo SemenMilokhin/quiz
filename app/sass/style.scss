@@ -102,6 +102,7 @@ body, button, input, textarea {
 		padding: 25px 30px;
 		flex-grow: 1;
 		overflow: auto;
+		position: relative;
 		> :nth-last-child(n+2) {
 			margin: 0 0 20px;
 		}
@@ -552,17 +553,39 @@ body, button, input, textarea {
 			padding: 14px 15px;
 		}
 	}
-	&__footer {
+	&__end-btn-wrapper {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		padding: 25px 30px;
+	}
+	&__end-btn {
+		background-color: $contrast-color;
+		border-radius: 5px;
+		box-shadow: 0 3px 10px 0 rgba(0,111,218,0.5);
+		color: #fff;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 1.25;
+		padding: 14px 15px;
+		text-decoration: none;
+	}
+	&__footer {
+		align-items: center;
 		border-top: 2px solid #f3f3f3;
 		display: flex;
-		justify-content: space-between;
-		align-items: center;
 		flex-wrap: wrap;
+		justify-content: space-between;
+		padding: 25px 30px;
 	}
 	&__process {
 		flex-grow: 1;
-		margin: 7px 40px 7px 0;
+		margin: 7px 0;
 	}
 	&__process-label {
 		font-size: 12px;
@@ -613,6 +636,7 @@ body, button, input, textarea {
 		justify-content: flex-start;
 		align-items: center;
 		flex-wrap: wrap;
+		margin-left: 40px;
 	}
 	&__btn {
 		display: block;
@@ -756,7 +780,7 @@ body, button, input, textarea {
 		height: 100vh;
 		border: none;
 		&__body {
-			margin-bottom: 104px;
+			margin-bottom: 94px;
 		}
 		&__footer {
 			position: fixed;
@@ -825,6 +849,9 @@ body, button, input, textarea {
 				width: 26px;
 			}
 		}
+		&__end-btn-wrapper {
+			padding: 15px;
+		}
 		&__footer {
 			padding: 15px;
 			flex-direction: column;
@@ -833,11 +860,12 @@ body, button, input, textarea {
 		}
 		&__buttons {
 			justify-content: space-between;
+			margin-top: 20px;
+			margin-left: 0;
 		}
 		&__process {
 			margin-top: 0;
-			margin-right: 0;
-			margin-bottom: 20px;
+			margin-bottom: 0;
 		}
 		&__btn {
 			margin-right: 0;

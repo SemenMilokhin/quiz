@@ -19,7 +19,6 @@ $(document).ready(function(){
 						case 'radio':
 						case 'checkbox':
 						case 'pic':
-						case 'sortable':
 							if ($('.quiz__hidden-input:checked').length === 0) result = false;
 							break;
 						case 'select':
@@ -30,6 +29,9 @@ $(document).ready(function(){
 							break;
 						case 'num':
 							if ($('.quiz__number').val()==='') result = false;
+							break;
+						case 'sortable':
+							if ($('.quiz__hidden-input:checked').length === 0 || $('.quiz__hidden-input').length !== $('.quiz__hidden-input:checked').length) result = false;
 							break;
 					}
 					return result;
@@ -173,9 +175,9 @@ $(document).ready(function(){
 						var title = $('.quiz__title'),
 							description = $('.quiz__description'),
 							body = $('.quiz__body'),
+							footer = $('.quiz__footer'),
 							processLabelValue = $('.quiz__process-label span'),
 							processFieldStyle = $('.quiz__process-field span'),
-							buttons = $('.quiz__buttons'),
 							prevBtn = $('<button>',{
 								class: 'quiz__btn quiz__btn_prev quiz__btn_fill',
 								text: 'Назад',
@@ -549,6 +551,17 @@ $(document).ready(function(){
 								});
 								block.appendTo($('.quiz__body'));
 								break;
+							case 'end':
+								var block = $('<div>',{
+									class: 'quiz__end-btn-wrapper',
+									append: $('<a>',{
+										'href': obj.url,
+										class: 'quiz__end-btn',
+										text: obj.message,
+									})
+								});
+								block.appendTo($('.quiz__body'));
+								break;
 							case 'sortable':
 								var block = $('<div>',{class: 'quiz__order'});
 								if (obj.answer !== undefined) {
@@ -686,7 +699,9 @@ $(document).ready(function(){
 						}
 						processLabelValue.empty().append(progressPercent+'%');
 						processFieldStyle.css({width:progressPercent+'%'});
-						buttons.empty();
+
+						$('.quiz__buttons').remove();
+						var buttons = $('<div>',{class: 'quiz__buttons'});
 						if (obj !== data.poll[data.order[0]] && obj.back === '1') {
 							buttons.append(prevBtn);
 						}
@@ -696,7 +711,10 @@ $(document).ready(function(){
 						if (obj !== data.poll[data.order[data.order.length-1]]) {
 							buttons.append(nextBtn);
 						}
-						initButtons();
+						if (!buttons.is(':empty')) {
+							footer.append(buttons);
+							initButtons();
+						}
 						if (obj.text !== undefined && obj.text.length>0) {
 							switch(obj.type) {
 								case 'checkbox':
@@ -743,7 +761,7 @@ $(document).ready(function(){
 									break;
 							}
 						}
-						$('.quiz__body').css({
+						$('.quiz__body').scrollTop(0).css({
 							transform: 'translateX('+(100*factor)+'px)',
 							transition: 'all 0s'
 						});
