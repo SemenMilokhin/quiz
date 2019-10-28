@@ -3,7 +3,19 @@ $(document).ready(function(){
 
 	function loadJSON() {
 		$.getJSON('json/config.json', function(data){
-			var initButtons = function() {
+			var shuffleArr = function(arr) {
+					var j, temp;
+
+					for(var i = arr.length - 1; i > 0; i--){
+						j = Math.floor(Math.random()*(i + 1));
+						temp = arr[j];
+						arr[j] = arr[i];
+						arr[i] = temp;
+					}
+
+					return arr;
+				},
+				initButtons = function() {
 					var buttons = $('.quiz__buttons'),
 						prevBtn = buttons.find('.quiz__btn_prev'),
 						skipBtn = buttons.find('.quiz__btn_skip'),
@@ -861,7 +873,7 @@ $(document).ready(function(){
 						data.currentChunk--;
 						renderQuestion(data.poll[data.order[data.currentChunk]],'right');
 					}
-				}
+				},
 				skipChunk = function() {
 					if (data.currentChunk >= 0 && data.currentChunk < data.order.length-1) {
 						data.currentChunk++;
@@ -870,7 +882,7 @@ $(document).ready(function(){
 							sendAnswer();
 						}
 					}
-				}
+				},
 				renderNextChunk = function() {
 					if (checkConditions(data.poll[data.order[data.currentChunk]]) && data.currentChunk < data.order.length-1) {
 						addAnswers(data.poll[data.order[data.currentChunk]]);
@@ -922,6 +934,28 @@ $(document).ready(function(){
 					data.order.push(key);
 				} else if (data.poll.hasOwnProperty(key)&&key.substr(0,1)==='r') {
 					data.subQuestions.push(key);
+				}
+				if (data.poll[key].type === 'radio' ||
+					data.poll[key].type === 'checkbox' ||
+					data.poll[key].type === 'select' ||
+					data.poll[key].type === 'sortable' ||
+					data.poll[key].type === 'slider') {
+					if (data.poll[key].random === 'true' || data.poll[key].random === true) {
+						var tempArr = [];
+						for (var pollKey in data.poll[key].poll) {
+							var tempObj = {};
+							tempObj[pollKey] = data.poll[key].poll[pollKey];
+							tempArr.push(tempObj);
+						}
+						shuffleArr(tempArr);
+						delete data.poll[key].poll;
+						data.poll[key].poll = {};
+						for (var i = 0; i < tempArr.length; i++) {
+							for (var tempArrKey in tempArr[i]) {
+								data.poll[key].poll[tempArrKey] = tempArr[i][tempArrKey];
+							}
+						}
+					}
 				}
 			}
 			data.order.sort(function(a,b){
