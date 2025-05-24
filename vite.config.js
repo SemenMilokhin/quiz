@@ -12,7 +12,7 @@ const htmlFiles = readdirSync(srcDir).filter(file => extname(file) === '.html')
   }, {})
 
 export default defineConfig({
-    base: '/questionnaire',
+    base: '/quiz',
     root: 'src/',
     publicDir: '../public',
     build: {

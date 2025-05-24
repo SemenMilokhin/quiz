@@ -4,7 +4,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://SemenMilokhin.github.io/questionnaire",
+  "homepage": "https://SemenMilokhin.github.io/quiz",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
