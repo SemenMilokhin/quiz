@@ -25,7 +25,7 @@
     },
     "p1000293133": {
       "title": "Укажите Ваш возраст",
-      "description": "",
+      "description": " если указать меньше 19, опрос завершится",
       "type": "num",
       "skip": "0",
       "back": "1",
@@ -282,12 +282,12 @@
     },
     "p9000293132": {
       "title": "Спасибо",
-      "description": "опрос закончен",
+      "description": "опрос закончен, JSON с ответами сформирован в консоли",
       "type": "end",
       "skip": "0",
       "back": "0",
       "message": "Перейти обратно на сайт",
-      "url": "https://yandex.ru"
+      "url": "https://github.com/SemenMilokhin/questionnaire"
     }
   }
 }

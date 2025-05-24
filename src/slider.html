@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<title>Quiz</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="sass/style.scss">
 </head>
 <body class="quiz-container">
 	<div class="quiz">
@@ -50,26 +50,6 @@
 			</div>
 		</div>
 	</div>
-	<script src="js/jquery.min.js"></script>
-	<script>
-		$(document).ready(function(){
-			initSliders();
-
-			function initSliders() {
-				var sliders = $('.quiz__slider');
-				sliders.each(function(i,el){
-					var input = $(el).find('.quiz__slider-field'),
-						output = $(el).find('.quiz__slider-value');
-					output.text(input.val());
-					input.off('input.my').on('input.my',function(){
-						output.text(input.val());
-					});
-					input.off('change.my').on('change.my',function(){
-						output.text(input.val());
-					});
-				});
-			}
-		});
-	</script>
+	<script type="module" src="js/sliderPage.js"></script>
 </body>
 </html>

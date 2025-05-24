@@ -1,0 +1,31 @@
+$fonts-path: '../../public/assets/fonts/';
+@font-face {
+    font-family: 'Gilroy';
+    src: url($fonts-path + 'Gilroy-Regular.eot');
+    src: local('Gilroy Regular'), local('Gilroy-Regular'),
+        url($fonts-path + 'Gilroy-Regular.eot?#iefix') format('embedded-opentype'),
+        url($fonts-path + 'Gilroy-Regular.woff') format('woff'),
+        url($fonts-path + 'Gilroy-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Gilroy';
+    src: url($fonts-path + 'Gilroy-Medium.eot');
+    src: local('Gilroy Medium'), local('Gilroy-Medium'),
+        url($fonts-path + 'Gilroy-Medium.eot?#iefix') format('embedded-opentype'),
+        url($fonts-path + 'Gilroy-Medium.woff') format('woff'),
+        url($fonts-path + 'Gilroy-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Gilroy';
+    src: url($fonts-path + 'Gilroy-Bold.eot');
+    src: local('Gilroy Bold'), local('Gilroy-Bold'),
+        url($fonts-path + 'Gilroy-Bold.eot?#iefix') format('embedded-opentype'),
+        url($fonts-path + 'Gilroy-Bold.woff') format('woff'),
+        url($fonts-path + 'Gilroy-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}

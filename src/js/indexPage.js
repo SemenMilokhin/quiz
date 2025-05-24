@@ -1,8 +1,12 @@
+import $ from 'jquery/dist/jquery.min.js';
+window.$ = $;
+window.jQuery = $;
+import Swiper from 'swiper/bundle';
 $(document).ready(function(){
 	loadJSON();
 
 	function loadJSON() {
-		$.getJSON('json/config.json', function(data){
+		$.getJSON('questionnaire/json/config.json', function(data){
 			var shuffleArr = function(arr) {
 					var j, temp;
 
