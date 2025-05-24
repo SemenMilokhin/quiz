@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Quiz</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="module" crossorigin src="/quiz/js/slider.js"></script>
+  <link rel="modulepreload" crossorigin href="/quiz/js/jquery.min.js">
+  <link rel="stylesheet" crossorigin href="/quiz/assets/stylesheets/style.css">
+</head>
+<body class="quiz-container">
+	<div class="quiz">
+		<div class="quiz__header">
+			<h1 class="quiz__title">title</h1>
+			<p class="quiz__description">description</p>
+		</div>
+		<div class="quiz__body">
+			<ul class="quiz__sliders-list">
+				<li class="quiz__slider">
+					<h2 class="quiz__slider-title">Проверка баланса бонусов</h2>
+					<div class="quiz__slider-field-wrapper">
+						<input class="quiz__slider-field" type="range" min="0" max="10" value="5">
+						<div class="quiz__slider-value"></div>
+					</div>
+				</li>
+				<li class="quiz__slider">
+					<h2 class="quiz__slider-title">Проверка последних операций/покупок</h2>
+					<div class="quiz__slider-field-wrapper">
+						<input class="quiz__slider-field" type="range" min="0" max="10" value="5">
+						<div class="quiz__slider-value"></div>
+					</div>
+				</li>
+				<li class="quiz__slider">
+					<h2 class="quiz__slider-title">Проверка персональных предложений</h2>
+					<div class="quiz__slider-field-wrapper">
+						<input class="quiz__slider-field" type="range" min="0" max="10" value="5">
+						<div class="quiz__slider-value"></div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="quiz__footer">
+			<div class="quiz__process">
+				<div class="quiz__process-label">
+					Готово:<span>20%</span>
+				</div>
+				<div class="quiz__process-field">
+					<span style="width: 20%;"></span>
+				</div>
+			</div>
+			<div class="quiz__buttons">
+			</div>
+		</div>
+	</div>
+</body>
+</html>
