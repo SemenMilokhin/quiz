@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<title>Quiz Formation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="module" crossorigin src="/quiz/js/formation.js"></script>
+  <link rel="modulepreload" crossorigin href="/quiz/js/jquery.min.js">
+  <link rel="stylesheet" crossorigin href="/quiz/assets/stylesheets/formation.css">
+</head>
+<body class="quiz-container">
+	<div class="quiz">
+		<div class="quiz__header">
+			<div class="quiz__select" id="main-select"></div>
+		</div>
+		<div class="quiz__body">
+		</div>
+		<div class="quiz__footer">
+			<div class="quiz__buttons">
+				<button class="quiz__btn quiz__btn_prev quiz__btn_fill">
+					<svg class="quiz__btn-svg quiz__btn-svg_inverted"></svg>Назад
+				</button>
+				<button class="quiz__btn quiz__btn_next quiz__btn_fill">
+					Вперёд<svg class="quiz__btn-svg"></svg>
+				</button>
+				<button class="quiz__btn quiz__btn_delete">Удалить</button>
+				<button class="quiz__btn quiz__btn_save">Сохранить</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
