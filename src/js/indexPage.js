@@ -6,7 +6,7 @@ $(document).ready(function(){
 	loadJSON();
 
 	function loadJSON() {
-		$.getJSON('questionnaire/json/config.json', function(data){
+		$.getJSON('quiz/json/config.json', function(data){
 			var shuffleArr = function(arr) {
 					var j, temp;
 
