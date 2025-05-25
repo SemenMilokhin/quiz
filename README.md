@@ -5,9 +5,9 @@
 | Страница | Ссылка |
 | ------ | ------ |
 | Прохождение опроса (главная) | [index.html](https://semenmilokhin.github.io/quiz/index.html) |
-| Формирование опроса | [index.html](https://semenmilokhin.github.io/quiz/formation.html) |
-| Ответ типа "ползунок" | [index.html](https://semenmilokhin.github.io/quiz/slider.html) |
-| Ответ типа "определить порядок" | [index.html](https://semenmilokhin.github.io/quiz/order.html) |
+| Формирование опроса | [formation.html](https://semenmilokhin.github.io/quiz/formation.html) |
+| Ответ типа "ползунок" | [slider.html](https://semenmilokhin.github.io/quiz/slider.html) |
+| Ответ типа "определить порядок" | [order.html](https://semenmilokhin.github.io/quiz/order.html) |
 
 Проект собран на Vite  
 В работе использовались библиотеки: jQuery, Swiper  
