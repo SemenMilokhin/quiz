@@ -37,7 +37,7 @@
     },
     "p3000293132": {
       "title": "Город",
-      "description": "В каком регионе Вы постоянно проживаете?",
+      "description": "В каком регионе Вы постоянно проживаете? (ответы специально перемешаны)",
       "type": "select",
       "skip": "0",
       "back": "1",
@@ -175,11 +175,12 @@
         "id36": "Отлично"
       },
       "pic": {
-        "id32": "https:\/\/poll.top2top.org\/img\/1.png",
-        "id33": "https:\/\/poll.top2top.org\/img\/2.png",
-        "id34": "https:\/\/poll.top2top.org\/img\/3.png",
-        "id35": "https:\/\/poll.top2top.org\/img\/4.png",
-        "id36": "https:\/\/poll.top2top.org\/img\/5.png"
+        
+        "id32": "assets\/images\/pic.jpg",
+        "id33": "assets\/images\/pic.jpg",
+        "id34": "assets\/images\/pic.jpg",
+        "id35": "assets\/images\/pic.jpg",
+        "id36": "assets\/images\/pic.jpg"
       },
       "random": "true"
     },
